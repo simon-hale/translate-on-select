@@ -1,6 +1,8 @@
 # Translate-On-Select
 
-This is a Chrome Extension that was ***almost entirely built with ChatGPT*** — yes, it's an ***AI-BUILT PROJECT***.  
+This is a Chrome Extension for translating selected text on web pages.
+
+It was ***almost entirely built with ChatGPT*** — yes, it's an ***AI-BUILT PROJECT***.  
 
 My own work mainly involved manually integrating the translation API and, um, right — also uploading it to GitHub.
 

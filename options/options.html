@@ -1,0 +1,104 @@
+<head>
+  <meta charset="utf-8" />
+  <title>Translate on Select - Settings</title>
+  <style>
+    /* 初始把所有可切换区域隐藏，避免闪烁（FOUC） */
+    .section { display: none; }
+
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; padding:18px; max-width:700px; }
+    label { display:block; margin-top:12px; font-weight:600; }
+    input, select { width:100%; padding:8px; margin-top:6px; box-sizing:border-box; }
+    button { margin-top:12px; padding:8px 12px; }
+    .note { margin-top:10px; color:#666; font-size:13px; }
+  </style>
+</head>
+<body>
+  <h2>Translate on Select — Settings</h2>
+
+  <!-- 总控制：选择服务器模式 -->
+  <label>选择服务器模式
+    <select id="modeSelect">
+      <option value="server" selected>自定义服务器</option>
+      <option value="api">自定义API</option>
+    </select>
+  </label>
+
+  <!-- Section 1：自定义服务器 -->
+  <div id="serverSection" class="section">
+    <label>URL
+      <input id="server" type="text" placeholder="输入服务器地址"/>
+    </label>
+    <label>
+      <select id="HTTPMethods" charset="utf-8">
+        <option value="POST" selected>POST</option>
+        <option value="GET">GET</option>
+      </select>
+    </label>
+    <label>
+      <select id="apiSelectServer" charset="utf-8">
+        <option value="deepseek/" selected>Deepseek V3 Chat</option>
+        <option value="deepl/">DeepL - Auto Detect Account Type</option>
+      </select>
+    </label>
+
+    <!-- 新增：保存 / 清空 按钮 -->
+    <div>
+      <button id="saveBtn-server">保存服务器配置</button>
+      <button id="clearBtn-server" style="margin-left:8px;">清除服务器配置</button>
+    </div>
+
+    <div class="note-server">
+      <p><strong>安全提示：</strong>\请放心，您的个人信息仅保存于本地，并受浏览器保护，本插件不会获取任何您的个人信息。</p>
+    </div>
+
+  </div>
+
+  <!-- Section 2：自定义API -->
+  <div id="apiSection" class="section">
+    <label>
+      <select id="apiSelect" charset="utf-8">
+        <option value="deepl-api" selected>DeepL</option>
+        <option value="deepseek-api">Deepseek V3 Chat</option>
+        <option value="google-api">Google Translate</option>
+      </select>
+    </label>
+  </div>
+
+  <div id="deeplApiSection" class="section">
+    <label>DeepL API Key
+      <input id="apiKey-deepl" type="text" placeholder="DeepL-Auth-Key (不要公开分享)"/>
+    </label>
+
+    <label>Endpoint
+      <select id="endpoint-deepl">
+        <option value="free-deepl" selected>DeepL Free</option>
+        <option value="pro-deepl">DeepL Pro</option>
+      </select>
+    </label>
+
+    <div>
+      <button id="saveBtn-deepl">保存</button>
+      <button id="clearBtn-deepl" style="margin-left:8px;">清除 Key</button>
+    </div>
+
+    <div class="note-deepl">
+      <p><strong>安全提示：</strong>不要公开发布您的 apiKey 。 此操作仅适用于测试环境。请放心，您的个人信息仅保存于本地，并受浏览器保护，本插件不会获取任何您的个人信息。</p>
+    </div>
+  </div>
+
+  <div id="deepseekApiSection" class="section">
+    <label>Deepseek API Key
+      <input id="apiKey-deepseek" type="text" placeholder="Deepseek-Api-Key (不要公开分享)"/>
+    </label>
+    <div>
+      <button id="saveBtn-deepseek">保存</button>
+      <button id="clearBtn-deepseek" style="margin-left:8px;">清除 Key</button>
+    </div>
+  </div>
+
+  <div id="googleApiSection" class="section">
+    暂未适配
+  </div>
+
+  <script src="options.js"></script>
+</body>

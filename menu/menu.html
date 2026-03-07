@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>翻译选项</title>
+    <style>
+      /* 默认隐藏 .section  */
+      .section { display: none; }
+    </style>
+  </head>
+
+  <body>
+    <label class="block-label" for="targetLang">选择目标语言</label>
+
+    <label id="server-label" class="block-label">Powered By Server</label>
+    <label id="deepl-label" class="block-label">Powered By DeepL</label>
+    <label id="deepseek-label" class="block-label">Powered By Deepseek</label>
+    <label id="google-label" class="block-label">Powered By Google Translate</label>
+
+    <select id="targetLang" aria-label="目标语言">
+      <option value="ZH-HANS" selected>ZH-HANS 中文（简体）</option>
+      <option value="ZH-HANT">ZH-HANT 中文（繁体）</option>
+      <option value="EN-GB">EN-GB（英语-英式）</option>
+      <option value="EN-US">EN-US（英语-美式）</option>
+      <option value="JA">JA（日语）</option>
+      <option value="DE">DE（德语）</option>
+      <option value="FR">FR（法语）</option>
+      <option value="RU">RU（俄语）</option>
+    </select>
+
+    <label class="block-label big-gap" style="display: inline-block; margin-top: 5px;">翻译源快速切换</label>
+
+    <select id="quickModeSelect" style="margin-top: 3px;">
+      <option value="server" selected>自定义服务器</option>
+      <option value="api">自定义API</option>
+    </select>
+
+    <select id="quickApiSelectServer" style="margin-top: 3px;">
+      <option value="deepseek/" selected>Deepseek V3 Chat</option>
+      <option value="deepl/">DeepL</option>
+    </select>
+
+    <select id="quickApiSelect" style="margin-top: 3px;">
+      <option value="deepseek-api" selected>Deepseek V3 Chat</option>
+      <option value="deepl-api">DeepL</option>
+      <option value="google-api">Google Translate</option>
+    </select>
+
+    <select id="streamDeepseekSelect" style="margin-top: 3px;">
+      <option value="true" selected>Stream</option>
+      <option value="false">unStream</option>
+    </select>
+
+    <script src="menu.js"></script>
+  </body>
+</html>

@@ -10,7 +10,7 @@ The extension currently integrates Deepseek V3 and DeepL. All you need to do is 
 
 The API integration offers two options:  
 1. Store the token locally and send it directly with each translation request to the API.  
-2. Use a [Backend](https://github.com/simon-hale/translate-on-select-backend, "click to jump") layer to act as a relay.  
+2. Use a [Backend](https://github.com/simon-hale/translate-on-select-backend "click to jump") layer to act as a relay.  
 
 Which one to choose? That’s for you to explore.  
 

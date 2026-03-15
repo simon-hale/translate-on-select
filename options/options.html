@@ -1,104 +1,244 @@
-<head>
-  <meta charset="utf-8" />
-  <title>Translate on Select - Settings</title>
-  <style>
-    /* 初始把所有可切换区域隐藏，避免闪烁（FOUC） */
-    .section { display: none; }
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Translate on Select - 设置</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
 
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; padding:18px; max-width:700px; }
-    label { display:block; margin-top:12px; font-weight:600; }
-    input, select { width:100%; padding:8px; margin-top:6px; box-sizing:border-box; }
-    button { margin-top:12px; padding:8px 12px; }
-    .note { margin-top:10px; color:#666; font-size:13px; }
-  </style>
-</head>
-<body>
-  <h2>Translate on Select — Settings</h2>
+  <body>
+    <main class="page-shell">
+      <div class="ambient ambient-one"></div>
+      <div class="ambient ambient-two"></div>
 
-  <!-- 总控制：选择服务器模式 -->
-  <label>选择服务器模式
-    <select id="modeSelect">
-      <option value="server" selected>自定义服务器</option>
-      <option value="api">自定义API</option>
-    </select>
-  </label>
+      <header class="hero-card">
+        <div class="hero-copy">
+          <p class="eyebrow">Translate on Select</p>
+          <h1>扩展设置</h1>
+          <p class="hero-text">管理模式、服务器地址和 API Key。</p>
 
-  <!-- Section 1：自定义服务器 -->
-  <div id="serverSection" class="section">
-    <label>URL
-      <input id="server" type="text" placeholder="输入服务器地址"/>
-    </label>
-    <label>
-      <select id="HTTPMethods" charset="utf-8">
-        <option value="POST" selected>POST</option>
-        <option value="GET">GET</option>
-      </select>
-    </label>
-    <label>
-      <select id="apiSelectServer" charset="utf-8">
-        <option value="deepseek/" selected>Deepseek V3 Chat</option>
-        <option value="deepl/">DeepL - Auto Detect Account Type</option>
-      </select>
-    </label>
+          <div class="hero-badges">
+            <span class="hero-badge">
+              <span class="badge-label">当前模式</span>
+              <strong id="modeBadge">自定义服务器</strong>
+            </span>
+            <span class="hero-badge">
+              <span class="badge-label">当前来源</span>
+              <strong id="brandBadge">Deepseek V3 Chat</strong>
+            </span>
+          </div>
+        </div>
 
-    <!-- 新增：保存 / 清空 按钮 -->
-    <div>
-      <button id="saveBtn-server">保存服务器配置</button>
-      <button id="clearBtn-server" style="margin-left:8px;">清除服务器配置</button>
-    </div>
+        <div class="hero-side">
+          <img class="hero-icon" src="../icons/icon_128.png" alt="Translate on Select 图标" />
+          <div class="side-card">
+            <span class="side-title">本地存储</span>
+            <p>配置只保存在当前浏览器。</p>
+          </div>
+        </div>
+      </header>
 
-    <div class="note-server">
-      <p><strong>安全提示：</strong>\请放心，您的个人信息仅保存于本地，并受浏览器保护，本插件不会获取任何您的个人信息。</p>
-    </div>
+      <section class="content-grid">
+        <aside class="info-panel">
+          <div class="info-card">
+            <h2>建议</h2>
+            <p>有自建中转服务时，优先使用服务器模式。</p>
+          </div>
 
-  </div>
+          <div class="info-card warm">
+            <h2>安全</h2>
+            <p>不要公开带有 API Key 的截图或配置。</p>
+          </div>
 
-  <!-- Section 2：自定义API -->
-  <div id="apiSection" class="section">
-    <label>
-      <select id="apiSelect" charset="utf-8">
-        <option value="deepl-api" selected>DeepL</option>
-        <option value="deepseek-api">Deepseek V3 Chat</option>
-        <option value="google-api">Google Translate</option>
-      </select>
-    </label>
-  </div>
+          <div class="info-card">
+            <h2>当前模式</h2>
+            <p id="modeSummary">当前为服务器模式。</p>
+          </div>
+        </aside>
 
-  <div id="deeplApiSection" class="section">
-    <label>DeepL API Key
-      <input id="apiKey-deepl" type="text" placeholder="DeepL-Auth-Key (不要公开分享)"/>
-    </label>
+        <div class="settings-stack">
+          <section class="settings-card">
+            <div class="card-head">
+              <div>
+                <p class="section-kicker">Mode</p>
+                <h2>翻译模式</h2>
+              </div>
+              <p class="card-copy">先选模式，再填对应配置。</p>
+            </div>
 
-    <label>Endpoint
-      <select id="endpoint-deepl">
-        <option value="free-deepl" selected>DeepL Free</option>
-        <option value="pro-deepl">DeepL Pro</option>
-      </select>
-    </label>
+            <div class="field">
+              <label class="field-label" for="modeSelect">工作模式</label>
+              <span class="field-hint">服务器模式走后端，API 模式直连第三方。</span>
+              <div class="select-wrap">
+                <select id="modeSelect">
+                  <option value="server" selected>自定义服务器</option>
+                  <option value="api">自定义 API</option>
+                </select>
+              </div>
+            </div>
+          </section>
 
-    <div>
-      <button id="saveBtn-deepl">保存</button>
-      <button id="clearBtn-deepl" style="margin-left:8px;">清除 Key</button>
-    </div>
+          <section id="serverSection" class="settings-card section-card" hidden>
+            <div class="card-head">
+              <div>
+                <p class="section-kicker">Server</p>
+                <h2>服务器</h2>
+              </div>
+              <p class="card-copy">填写地址、请求方式和服务类型。</p>
+            </div>
 
-    <div class="note-deepl">
-      <p><strong>安全提示：</strong>不要公开发布您的 apiKey 。 此操作仅适用于测试环境。请放心，您的个人信息仅保存于本地，并受浏览器保护，本插件不会获取任何您的个人信息。</p>
-    </div>
-  </div>
+            <div class="field-grid">
+              <div class="field">
+                <label class="field-label" for="server">服务器 URL</label>
+                <input
+                  id="server"
+                  type="text"
+                  placeholder="https://your-server.example.com/"
+                  autocomplete="url"
+                  spellcheck="false"
+                />
+              </div>
 
-  <div id="deepseekApiSection" class="section">
-    <label>Deepseek API Key
-      <input id="apiKey-deepseek" type="text" placeholder="Deepseek-Api-Key (不要公开分享)"/>
-    </label>
-    <div>
-      <button id="saveBtn-deepseek">保存</button>
-      <button id="clearBtn-deepseek" style="margin-left:8px;">清除 Key</button>
-    </div>
-  </div>
+              <div class="field">
+                <label class="field-label" for="HTTPMethods">请求方法</label>
+                <div class="select-wrap">
+                  <select id="HTTPMethods">
+                    <option value="POST" selected>POST</option>
+                    <option value="GET">GET</option>
+                  </select>
+                </div>
+              </div>
+            </div>
 
-  <div id="googleApiSection" class="section">
-    暂未适配
-  </div>
+            <div class="field">
+              <label class="field-label" for="apiSelectServer">服务端点类型</label>
+              <span class="field-hint">选择当前服务端类型。</span>
+              <div class="select-wrap">
+                <select id="apiSelectServer">
+                  <option value="deepseek/" selected>Deepseek V3 Chat</option>
+                  <option value="deepl/">DeepL - 自动识别账号类型</option>
+                </select>
+              </div>
+            </div>
 
-  <script src="options.js"></script>
-</body>
+            <div class="action-row">
+              <button id="saveBtn-server" class="button primary" type="button">保存配置</button>
+              <button id="clearBtn-server" class="button secondary" type="button">清空</button>
+            </div>
+
+            <div class="notice">
+              <strong>提示</strong>
+              <p>保存时会自动补全末尾的 `/`。</p>
+            </div>
+          </section>
+
+          <section id="apiSection" class="settings-card section-card" hidden>
+            <div class="card-head">
+              <div>
+                <p class="section-kicker">API</p>
+                <h2>API 品牌</h2>
+              </div>
+              <p class="card-copy">切换后显示对应配置。</p>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="apiSelect">当前品牌</label>
+              <div class="select-wrap">
+                <select id="apiSelect">
+                  <option value="deepl-api" selected>DeepL</option>
+                  <option value="deepseek-api">Deepseek V3 Chat</option>
+                  <option value="google-api">Google Translate</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <section id="deeplApiSection" class="settings-card section-card" hidden>
+            <div class="card-head">
+              <div>
+                <p class="section-kicker">DeepL</p>
+                <h2>DeepL</h2>
+              </div>
+              <p class="card-copy">保存 DeepL Key 与 endpoint。</p>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="apiKey-deepl">API Key</label>
+              <input
+                id="apiKey-deepl"
+                type="password"
+                placeholder="DeepL-Auth-Key"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="endpoint-deepl">Endpoint</label>
+              <div class="select-wrap">
+                <select id="endpoint-deepl">
+                  <option value="free-deepl" selected>DeepL Free</option>
+                  <option value="pro-deepl">DeepL Pro</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <button id="saveBtn-deepl" class="button primary" type="button">保存配置</button>
+              <button id="clearBtn-deepl" class="button secondary" type="button">清空 Key</button>
+            </div>
+
+            <div class="notice">
+              <strong>安全提醒</strong>
+              <p>不要公开包含 Key 的截图或录屏。</p>
+            </div>
+          </section>
+
+          <section id="deepseekApiSection" class="settings-card section-card" hidden>
+            <div class="card-head">
+              <div>
+                <p class="section-kicker">Deepseek</p>
+                <h2>Deepseek</h2>
+              </div>
+              <p class="card-copy">保存 Deepseek Key。</p>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="apiKey-deepseek">API Key</label>
+              <input
+                id="apiKey-deepseek"
+                type="password"
+                placeholder="Deepseek-Api-Key"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+
+            <div class="action-row">
+              <button id="saveBtn-deepseek" class="button primary" type="button">保存配置</button>
+              <button id="clearBtn-deepseek" class="button secondary" type="button">清空 Key</button>
+            </div>
+          </section>
+
+          <section id="googleApiSection" class="settings-card section-card" hidden>
+            <div class="card-head">
+              <div>
+                <p class="section-kicker">Google</p>
+                <h2>Google</h2>
+              </div>
+              <p class="card-copy">入口已预留，暂未接入。</p>
+            </div>
+
+            <div class="empty-state">
+              <strong>尚未适配</strong>
+              <p>后续可在这里补充配置项。</p>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="options.js"></script>
+  </body>
+</html>

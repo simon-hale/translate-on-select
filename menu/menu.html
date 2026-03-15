@@ -2,54 +2,85 @@
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
-    <title>翻译选项</title>
-    <style>
-      /* 默认隐藏 .section  */
-      .section { display: none; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>划词翻译</title>
+    <link rel="stylesheet" href="menu.css" />
   </head>
 
   <body>
-    <label class="block-label" for="targetLang">选择目标语言</label>
+    <main class="popup-shell">
+      <div class="ambient ambient-one"></div>
+      <div class="ambient ambient-two"></div>
 
-    <label id="server-label" class="block-label">Powered By Server</label>
-    <label id="deepl-label" class="block-label">Powered By DeepL</label>
-    <label id="deepseek-label" class="block-label">Powered By Deepseek</label>
-    <label id="google-label" class="block-label">Powered By Google Translate</label>
+      <section class="panel control-panel">
+        <div class="panel-header">
+          <p class="eyebrow">Translate on Select</p>
+          <h1>划词翻译</h1>
+        </div>
 
-    <select id="targetLang" aria-label="目标语言">
-      <option value="ZH-HANS" selected>ZH-HANS 中文（简体）</option>
-      <option value="ZH-HANT">ZH-HANT 中文（繁体）</option>
-      <option value="EN-GB">EN-GB（英语-英式）</option>
-      <option value="EN-US">EN-US（英语-美式）</option>
-      <option value="JA">JA（日语）</option>
-      <option value="DE">DE（德语）</option>
-      <option value="FR">FR（法语）</option>
-      <option value="RU">RU（俄语）</option>
-    </select>
+        <div class="field-group">
+          <label class="field-label" for="targetLang">目标语言</label>
+          <div class="select-wrap">
+            <select id="targetLang" aria-label="目标语言">
+              <option value="ZH-HANS" selected>ZH-HANS 中文（简体）</option>
+              <option value="ZH-HANT">ZH-HANT 中文（繁体）</option>
+              <option value="EN-GB">EN-GB 英语（英式）</option>
+              <option value="EN-US">EN-US 英语（美式）</option>
+              <option value="JA">JA 日语</option>
+              <option value="DE">DE 德语</option>
+              <option value="FR">FR 法语</option>
+              <option value="RU">RU 俄语</option>
+            </select>
+          </div>
+        </div>
 
-    <label class="block-label big-gap" style="display: inline-block; margin-top: 5px;">翻译源快速切换</label>
+        <div class="field-group">
+          <label class="field-label" for="quickModeSelect">快速切换模式</label>
+          <div class="select-wrap">
+            <select id="quickModeSelect">
+              <option value="server" selected>自定义服务器</option>
+              <option value="api">自定义 API</option>
+            </select>
+          </div>
+        </div>
 
-    <select id="quickModeSelect" style="margin-top: 3px;">
-      <option value="server" selected>自定义服务器</option>
-      <option value="api">自定义API</option>
-    </select>
+        <div class="field-group" id="quickServerGroup" hidden>
+          <label class="field-label" for="quickApiSelectServer">服务器端点</label>
+          <div class="select-wrap">
+            <select id="quickApiSelectServer">
+              <option value="deepseek/" selected>Deepseek V3 Chat</option>
+              <option value="deepl/">DeepL</option>
+            </select>
+          </div>
+        </div>
 
-    <select id="quickApiSelectServer" style="margin-top: 3px;">
-      <option value="deepseek/" selected>Deepseek V3 Chat</option>
-      <option value="deepl/">DeepL</option>
-    </select>
+        <div class="field-group" id="quickApiGroup" hidden>
+          <label class="field-label" for="quickApiSelect">API 来源</label>
+          <div class="select-wrap">
+            <select id="quickApiSelect">
+              <option value="deepseek-api" selected>Deepseek V3 Chat</option>
+              <option value="deepl-api">DeepL</option>
+              <option value="google-api">Google Translate</option>
+            </select>
+          </div>
+        </div>
 
-    <select id="quickApiSelect" style="margin-top: 3px;">
-      <option value="deepseek-api" selected>Deepseek V3 Chat</option>
-      <option value="deepl-api">DeepL</option>
-      <option value="google-api">Google Translate</option>
-    </select>
+        <div class="field-group" id="streamGroup" hidden>
+          <label class="field-label" for="streamDeepseekSelect">Deepseek 输出模式</label>
+          <div class="select-wrap">
+            <select id="streamDeepseekSelect">
+              <option value="true" selected>Streaming</option>
+              <option value="false">Non-streaming</option>
+            </select>
+          </div>
+        </div>
+      </section>
 
-    <select id="streamDeepseekSelect" style="margin-top: 3px;">
-      <option value="true" selected>Streaming</option>
-      <option value="false">non-Streaming</option>
-    </select>
+      <footer class="footer-bar">
+        <p class="storage-note">配置仅保存在本地。</p>
+        <button id="openOptionsBtn" class="ghost-button" type="button">更多设置</button>
+      </footer>
+    </main>
 
     <script src="menu.js"></script>
   </body>

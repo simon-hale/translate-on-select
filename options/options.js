@@ -1,104 +1,120 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // elements
-  const backendModelSelect = document.getElementById('modeSelect'); // 'server' or 'api'
+  const defaults = {
+    backendMode: 'server',
+    serverUrl: '',
+    httpMethod: 'POST',
+    apiSelectServer: 'deepseek/',
+    apiBrand: 'deepl-api',
+    deeplApiKey: '',
+    deepseekApiKey: '',
+    deeplEndpoint: 'free-deepl'
+  };
+
+  const modeLabels = {
+    server: '自定义服务器',
+    api: '自定义 API'
+  };
+
+  const apiLabels = {
+    'deepl-api': 'DeepL',
+    'deepseek-api': 'Deepseek V3 Chat',
+    'google-api': 'Google Translate'
+  };
+
+  const serverLabels = {
+    'deepseek/': 'Deepseek V3 Chat',
+    'deepl/': 'DeepL'
+  };
+
+  const modeSummaries = {
+    server: '当前为服务器模式。',
+    api: '当前为 API 模式。'
+  };
+
+  const backendModelSelect = document.getElementById('modeSelect');
   const serverSection = document.getElementById('serverSection');
   const apiSection = document.getElementById('apiSection');
-  const apiSelect = document.getElementById('apiSelect'); // 'deepl-api' or others
+  const apiSelect = document.getElementById('apiSelect');
 
-  // server controls
   const serverUrlInput = document.getElementById('server');
   const httpMethodSelect = document.getElementById('HTTPMethods');
   const apiSelectServer = document.getElementById('apiSelectServer');
   const saveBtnServer = document.getElementById('saveBtn-server');
   const clearBtnServer = document.getElementById('clearBtn-server');
 
-  // deepl controls
   const deeplSection = document.getElementById('deeplApiSection');
-  const apiKeyInput_deepl = document.getElementById('apiKey-deepl');
-  const endpointSelect_deepl = document.getElementById('endpoint-deepl');
-  const saveBtn_deepl = document.getElementById('saveBtn-deepl');
-  const clearBtn_deepl = document.getElementById('clearBtn-deepl');
+  const apiKeyInputDeepl = document.getElementById('apiKey-deepl');
+  const endpointSelectDeepl = document.getElementById('endpoint-deepl');
+  const saveBtnDeepl = document.getElementById('saveBtn-deepl');
+  const clearBtnDeepl = document.getElementById('clearBtn-deepl');
 
-  // deepseek controls
   const deepseekSection = document.getElementById('deepseekApiSection');
-  const apiKeyInput_deepseek = document.getElementById('apiKey-deepseek');
-  const saveBtn_deepseek = document.getElementById('saveBtn-deepseek');
-  const clearBtn_deepseek = document.getElementById('clearBtn-deepseek');
+  const apiKeyInputDeepseek = document.getElementById('apiKey-deepseek');
+  const saveBtnDeepseek = document.getElementById('saveBtn-deepseek');
+  const clearBtnDeepseek = document.getElementById('clearBtn-deepseek');
 
-  // google controls
   const googleSection = document.getElementById('googleApiSection');
+  const modeBadge = document.getElementById('modeBadge');
+  const brandBadge = document.getElementById('brandBadge');
+  const modeSummary = document.getElementById('modeSummary');
 
-  // update UI visibility based on selections
-  // 注意：因为我们在 CSS 中把 .section 默认 display:none，JS 必须显式设置 'block' 才能显示
+  function setSectionState(element, visible) {
+    element.hidden = !visible;
+  }
+
+  function updateOverview() {
+    const mode = backendModelSelect.value;
+    const brand = apiSelect.value;
+
+    modeBadge.textContent = modeLabels[mode] || modeLabels.server;
+    brandBadge.textContent = mode === 'server'
+      ? serverLabels[apiSelectServer.value] || serverLabels['deepseek/']
+      : apiLabels[brand] || apiLabels['deepl-api'];
+    modeSummary.textContent = modeSummaries[mode] || modeSummaries.server;
+  }
+
   function updateModeUI() {
     const mode = backendModelSelect.value;
-
-    serverSection.style.display = (mode === 'server') ? 'block' : 'none';
-    apiSection.style.display = (mode === 'api') ? 'block' : 'none';
-
     const brand = apiSelect.value;
 
-    deeplSection.style.display = (mode === 'api' && brand === 'deepl-api') ? 'block' : 'none';
-    deepseekSection.style.display = (mode === 'api' && brand === 'deepseek-api') ? 'block' : 'none';
-    googleSection.style.display = (mode === 'api' && brand === 'google-api') ? 'block' : 'none';
+    setSectionState(serverSection, mode === 'server');
+    setSectionState(apiSection, mode === 'api');
+    setSectionState(deeplSection, mode === 'api' && brand === 'deepl-api');
+    setSectionState(deepseekSection, mode === 'api' && brand === 'deepseek-api');
+    setSectionState(googleSection, mode === 'api' && brand === 'google-api');
+    updateOverview();
   }
 
-  // load saved settings and populate UI
   function loadSavedSettings() {
-    chrome.storage.local.get(
-      [
-        'backendMode',    // 'server' | 'api'
-        'serverUrl',
-        'httpMethod',
-        'apiSelectServer',
-        'apiBrand',       // 'deepl-api' etc.
-        'deeplApiKey',
-        'deepseekApiKey',
-        'deeplEndpoint'
-        // 待拓展其他api
-      ],
-      (items) => {
-        // backend mode
-        backendModelSelect.value = items && items.backendMode ? items.backendMode : 'server';
-
-        // server fields
-        serverUrlInput.value = items && items.serverUrl ? items.serverUrl : '';
-        httpMethodSelect.value = items && items.httpMethod ? items.httpMethod : 'POST';
-        apiSelectServer.value = items && items.apiSelectServer ? items.apiSelectServer : 'deepseek/';
-
-        // api brand
-        apiSelect.value = items && items.apiBrand ? items.apiBrand : 'deepl-api';
-
-        // deepl
-        apiKeyInput_deepl.value = items && items.deeplApiKey ? items.deeplApiKey : '';
-        endpointSelect_deepl.value = items && items.deeplEndpoint ? items.deeplEndpoint : 'free-deepl';
-
-        // deepseek
-        apiKeyInput_deepseek.value = items && items.deepseekApiKey ? items.deepseekApiKey : '';
-
-        // 待拓展其他api
-
-        updateModeUI();
+    chrome.storage.local.get(defaults, (items) => {
+      if (chrome.runtime.lastError) {
+        console.error('Failed to load settings:', chrome.runtime.lastError);
+        return;
       }
-    );
+
+      backendModelSelect.value = items.backendMode;
+      serverUrlInput.value = items.serverUrl;
+      httpMethodSelect.value = items.httpMethod;
+      apiSelectServer.value = items.apiSelectServer;
+      apiSelect.value = items.apiBrand;
+      apiKeyInputDeepl.value = items.deeplApiKey;
+      endpointSelectDeepl.value = items.deeplEndpoint;
+      apiKeyInputDeepseek.value = items.deepseekApiKey;
+
+      updateModeUI();
+    });
   }
 
-  // 后端模式保存
   backendModelSelect.addEventListener('change', () => {
-    const mode = backendModelSelect.value;
-    chrome.storage.local.set({ backendMode: mode }, updateModeUI);
+    chrome.storage.local.set({ backendMode: backendModelSelect.value }, updateModeUI);
   });
 
-  // 后端api模式保存
   apiSelectServer.addEventListener('change', () => {
-    const mode = apiSelectServer.value;
-    chrome.storage.local.set({ apiSelectServer: mode }, updateModeUI);
+    chrome.storage.local.set({ apiSelectServer: apiSelectServer.value }, updateModeUI);
   });
 
-  // api品牌保存
   apiSelect.addEventListener('change', () => {
-    const brand = apiSelect.value;
-    chrome.storage.local.set({ apiBrand: brand }, updateModeUI);
+    chrome.storage.local.set({ apiBrand: apiSelect.value }, updateModeUI);
   });
 
   saveBtnServer.addEventListener('click', () => {
@@ -107,12 +123,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiServer = apiSelectServer.value.trim();
 
     if (!url) {
-      alert('请输入服务器 URL 。');
+      alert('请输入服务器 URL。');
       serverUrlInput.focus();
       return;
     }
 
-    if (!url.endsWith('/')) url += '/';
+    if (!url.endsWith('/')) {
+      url += '/';
+    }
 
     chrome.storage.local.set(
       {
@@ -121,79 +139,89 @@ document.addEventListener('DOMContentLoaded', () => {
         apiSelectServer: apiServer
       },
       () => {
-        alert('服务器配置已保存');
-        serverUrlInput.focus();
+        alert('服务器配置已保存。');
+        serverUrlInput.value = url;
         updateModeUI();
       }
     );
   });
 
   clearBtnServer.addEventListener('click', () => {
-    chrome.storage.local.remove(['serverUrl', 'httpMethod'], () => {
+    chrome.storage.local.remove(['serverUrl', 'httpMethod', 'apiSelectServer'], () => {
       serverUrlInput.value = '';
-      httpMethodSelect.value = 'POST';
-      apiSelectServer.value = 'deepseek/';
-      alert('已重置服务器配置');
+      httpMethodSelect.value = defaults.httpMethod;
+      apiSelectServer.value = defaults.apiSelectServer;
+      alert('服务器配置已清空。');
+      updateModeUI();
     });
   });
 
-  // --- DeepL save / clear ---
-  saveBtn_deepl.addEventListener('click', () => {
-    const key = apiKeyInput_deepl.value.trim();
-    const endpoint = endpointSelect_deepl.value || 'free-deepl';
+  saveBtnDeepl.addEventListener('click', () => {
+    const key = apiKeyInputDeepl.value.trim();
+    const endpoint = endpointSelectDeepl.value || defaults.deeplEndpoint;
 
     if (!key) {
-      alert('请输入 api key 。');
+      alert('请输入 DeepL API Key。');
+      apiKeyInputDeepl.focus();
       return;
     }
 
     chrome.storage.local.set(
       {
         deeplApiKey: key,
-        deeplEndpoint: endpoint,
+        deeplEndpoint: endpoint
       },
       () => {
-        alert('DeepL API 设置已保存');
+        alert('DeepL 配置已保存。');
         updateModeUI();
       }
     );
   });
 
-  clearBtn_deepl.addEventListener('click', () => {
+  clearBtnDeepl.addEventListener('click', () => {
     chrome.storage.local.remove(['deeplApiKey', 'deeplEndpoint'], () => {
-      apiKeyInput_deepl.value = '';
-      endpointSelect_deepl.value = 'free-deepl'; // 重置默认
-      alert('已清除 DeepL 配置');
+      apiKeyInputDeepl.value = '';
+      endpointSelectDeepl.value = defaults.deeplEndpoint;
+      alert('DeepL 配置已清空。');
+      updateModeUI();
     });
   });
 
-  // --- Deepseek save / clear ---
-  saveBtn_deepseek.addEventListener('click', () => {
-    const key = apiKeyInput_deepseek.value.trim();
+  saveBtnDeepseek.addEventListener('click', () => {
+    const key = apiKeyInputDeepseek.value.trim();
 
     if (!key) {
-      alert('请输入 api key 。');
+      alert('请输入 Deepseek API Key。');
+      apiKeyInputDeepseek.focus();
       return;
     }
 
     chrome.storage.local.set(
       {
-        deepseekApiKey: key,
+        deepseekApiKey: key
       },
       () => {
-        alert('Deepseek API 设置已保存');
+        alert('Deepseek 配置已保存。');
         updateModeUI();
       }
     );
   });
 
-  clearBtn_deepseek.addEventListener('click', () => {
-    chrome.storage.local.remove(['deepseekApiKey', 'deepseekEndpoint'], () => {
-      apiKeyInput_deepseek.value = '';
-      alert('已清除 Deepseek 配置');
+  clearBtnDeepseek.addEventListener('click', () => {
+    chrome.storage.local.remove(['deepseekApiKey'], () => {
+      apiKeyInputDeepseek.value = '';
+      alert('Deepseek 配置已清空。');
+      updateModeUI();
     });
   });
 
-  // init func
+  if (chrome.storage && chrome.storage.onChanged) {
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName === 'local' && Object.keys(changes).length > 0) {
+        loadSavedSettings();
+      }
+    });
+  }
+
   loadSavedSettings();
 });

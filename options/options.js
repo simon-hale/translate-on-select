@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const apiKeyInputDeepseek = document.getElementById('apiKey-deepseek');
   const saveBtnDeepseek = document.getElementById('saveBtn-deepseek');
   const clearBtnDeepseek = document.getElementById('clearBtn-deepseek');
+  const visibilityToggles = Array.from(document.querySelectorAll('.input-visibility-toggle'));
 
   const googleSection = document.getElementById('googleApiSection');
   const modeBadge = document.getElementById('modeBadge');
@@ -60,6 +61,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function setSectionState(element, visible) {
     element.hidden = !visible;
+  }
+
+  function setInputVisibility(input, toggle, visible) {
+    if (!input || !toggle) return;
+
+    input.type = visible ? 'text' : 'password';
+    toggle.textContent = '显示';
+    toggle.setAttribute('aria-pressed', String(visible));
+
+    const label = toggle.dataset.label || '内容';
+    toggle.setAttribute('aria-label', `${visible ? '隐藏' : '显示'} ${label}`);
+  }
+
+  function resetInputVisibility(inputId) {
+    const toggle = visibilityToggles.find((button) => button.dataset.target === inputId);
+    const input = document.getElementById(inputId);
+
+    if (!toggle || !input) return;
+    setInputVisibility(input, toggle, false);
+  }
+
+  function initializeVisibilityToggles() {
+    visibilityToggles.forEach((toggle) => {
+      const input = document.getElementById(toggle.dataset.target);
+      if (!input) return;
+
+      setInputVisibility(input, toggle, false);
+      toggle.addEventListener('click', () => {
+        const nextVisible = input.type === 'password';
+        setInputVisibility(input, toggle, nextVisible);
+        input.focus({ preventScroll: true });
+      });
+    });
   }
 
   function updateOverview() {
@@ -182,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.remove(['deeplApiKey', 'deeplEndpoint'], () => {
       apiKeyInputDeepl.value = '';
       endpointSelectDeepl.value = defaults.deeplEndpoint;
+      resetInputVisibility('apiKey-deepl');
       alert('DeepL 配置已清空。');
       updateModeUI();
     });
@@ -210,6 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
   clearBtnDeepseek.addEventListener('click', () => {
     chrome.storage.local.remove(['deepseekApiKey'], () => {
       apiKeyInputDeepseek.value = '';
+      resetInputVisibility('apiKey-deepseek');
       alert('Deepseek 配置已清空。');
       updateModeUI();
     });
@@ -223,5 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  initializeVisibilityToggles();
   loadSavedSettings();
 });

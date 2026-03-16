@@ -165,13 +165,25 @@
 
             <div class="field">
               <label class="field-label" for="apiKey-deepl">API Key</label>
-              <input
-                id="apiKey-deepl"
-                type="password"
-                placeholder="DeepL-Auth-Key"
-                autocomplete="off"
-                spellcheck="false"
-              />
+              <div class="input-action-wrap">
+                <input
+                  id="apiKey-deepl"
+                  type="password"
+                  placeholder="DeepL-Auth-Key"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <button
+                  class="input-visibility-toggle"
+                  type="button"
+                  data-target="apiKey-deepl"
+                  data-label="DeepL API Key"
+                  aria-pressed="false"
+                  aria-label="显示 DeepL API Key"
+                >
+                  显示
+                </button>
+              </div>
             </div>
 
             <div class="field">
@@ -189,10 +201,6 @@
               <button id="clearBtn-deepl" class="button secondary" type="button">清空 Key</button>
             </div>
 
-            <div class="notice">
-              <strong>安全提醒</strong>
-              <p>不要公开包含 Key 的截图或录屏。</p>
-            </div>
           </section>
 
           <section id="deepseekApiSection" class="settings-card section-card" hidden>
@@ -206,13 +214,25 @@
 
             <div class="field">
               <label class="field-label" for="apiKey-deepseek">API Key</label>
-              <input
-                id="apiKey-deepseek"
-                type="password"
-                placeholder="Deepseek-Api-Key"
-                autocomplete="off"
-                spellcheck="false"
-              />
+              <div class="input-action-wrap">
+                <input
+                  id="apiKey-deepseek"
+                  type="password"
+                  placeholder="Deepseek-Api-Key"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <button
+                  class="input-visibility-toggle"
+                  type="button"
+                  data-target="apiKey-deepseek"
+                  data-label="Deepseek API Key"
+                  aria-pressed="false"
+                  aria-label="显示 Deepseek API Key"
+                >
+                  显示
+                </button>
+              </div>
             </div>
 
             <div class="action-row">

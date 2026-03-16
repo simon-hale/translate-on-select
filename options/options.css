@@ -299,6 +299,11 @@ select {
   display: block;
 }
 
+.input-action-wrap {
+  position: relative;
+  margin-top: 8px;
+}
+
 .field-label {
   display: block;
   font-size: 13px;
@@ -327,8 +332,52 @@ select {
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
+.input-action-wrap input {
+  margin-top: 0;
+  padding-right: 76px;
+}
+
 input::placeholder {
   color: rgba(97, 112, 119, 0.72);
+}
+
+.input-visibility-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(24, 38, 44, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink-soft);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+
+.input-visibility-toggle[aria-pressed="true"] {
+  border-color: rgba(198, 91, 46, 0.35);
+  color: var(--accent-deep);
+  background: rgba(198, 91, 46, 0.12);
+}
+
+.input-visibility-toggle:hover {
+  border-color: rgba(198, 91, 46, 0.35);
+  color: var(--accent-deep);
+  background: rgba(255, 249, 245, 0.98);
+}
+
+.input-visibility-toggle[aria-pressed="true"]:hover {
+  background: rgba(198, 91, 46, 0.16);
+}
+
+.input-visibility-toggle:focus-visible {
+  outline: none;
+  border-color: rgba(198, 91, 46, 0.55);
+  box-shadow: 0 0 0 4px rgba(198, 91, 46, 0.12);
 }
 
 .select-wrap {

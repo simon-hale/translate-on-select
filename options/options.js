@@ -1,4 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const i18n = globalThis.TranslateOnSelectI18n;
+  const theme = globalThis.TranslateOnSelectTheme;
+
+  if (!i18n) {
+    console.error('I18n helpers are unavailable in options page.');
+    return;
+  }
+
+  if (!theme) {
+    console.error('Theme helpers are unavailable in options page.');
+    return;
+  }
   const defaults = {
     backendMode: 'server',
     serverUrl: '',
@@ -7,31 +19,13 @@ document.addEventListener('DOMContentLoaded', () => {
     apiBrand: 'deepl-api',
     deeplApiKey: '',
     deepseekApiKey: '',
-    deeplEndpoint: 'free-deepl'
-  };
-
-  const modeLabels = {
-    server: '自定义服务器',
-    api: '自定义 API'
-  };
-
-  const apiLabels = {
-    'deepl-api': 'DeepL',
-    'deepseek-api': 'Deepseek V3 Chat',
-    'google-api': 'Google Translate'
-  };
-
-  const serverLabels = {
-    'deepseek/': 'Deepseek V3 Chat',
-    'deepl/': 'DeepL'
-  };
-
-  const modeSummaries = {
-    server: '当前为服务器模式。',
-    api: '当前为 API 模式。'
+    deeplEndpoint: 'free-deepl',
+    [i18n.UI_LANGUAGE_KEY]: i18n.detectInitialUiLanguage(),
+    [theme.THEME_MODE_KEY]: theme.DEFAULT_THEME_MODE
   };
 
   const backendModelSelect = document.getElementById('modeSelect');
+  const uiLanguageSelect = document.getElementById('uiLanguageSelect');
   const serverSection = document.getElementById('serverSection');
   const apiSection = document.getElementById('apiSection');
   const apiSelect = document.getElementById('apiSelect');
@@ -59,19 +53,37 @@ document.addEventListener('DOMContentLoaded', () => {
   const brandBadge = document.getElementById('brandBadge');
   const modeSummary = document.getElementById('modeSummary');
 
+  let currentLanguage = defaults[i18n.UI_LANGUAGE_KEY];
+
   function setSectionState(element, visible) {
     element.hidden = !visible;
+  }
+
+  function getModeLabel(mode) {
+    return i18n.t(currentLanguage, `shared.backendModes.${mode}`) || i18n.t(currentLanguage, 'shared.backendModes.server');
+  }
+
+  function getBrandLabel(mode, brand, serverBrand) {
+    if (mode === 'server') {
+      return i18n.t(currentLanguage, `shared.serverTargets.${serverBrand}`) || i18n.t(currentLanguage, 'shared.serverTargets.deepseek/');
+    }
+
+    return i18n.t(currentLanguage, `shared.apiBrands.${brand}`) || i18n.t(currentLanguage, 'shared.apiBrands.deepl-api');
   }
 
   function setInputVisibility(input, toggle, visible) {
     if (!input || !toggle) return;
 
-    input.type = visible ? 'text' : 'password';
-    toggle.textContent = '显示';
-    toggle.setAttribute('aria-pressed', String(visible));
+    const labelKey = toggle.dataset.labelKey || 'options.apiKeyLabel';
+    const label = i18n.t(currentLanguage, labelKey);
 
-    const label = toggle.dataset.label || '内容';
-    toggle.setAttribute('aria-label', `${visible ? '隐藏' : '显示'} ${label}`);
+    input.type = visible ? 'text' : 'password';
+    toggle.textContent = i18n.t(currentLanguage, visible ? 'options.toggle.hide' : 'options.toggle.show');
+    toggle.setAttribute('aria-pressed', String(visible));
+    toggle.setAttribute(
+      'aria-label',
+      i18n.t(currentLanguage, visible ? 'options.toggle.hideAria' : 'options.toggle.showAria', { label })
+    );
   }
 
   function resetInputVisibility(inputId) {
@@ -80,6 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!toggle || !input) return;
     setInputVisibility(input, toggle, false);
+  }
+
+  function refreshVisibilityToggleLabels() {
+    visibilityToggles.forEach((toggle) => {
+      const input = document.getElementById(toggle.dataset.target);
+      if (!input) return;
+      setInputVisibility(input, toggle, input.type === 'text');
+    });
   }
 
   function initializeVisibilityToggles() {
@@ -100,11 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const mode = backendModelSelect.value;
     const brand = apiSelect.value;
 
-    modeBadge.textContent = modeLabels[mode] || modeLabels.server;
-    brandBadge.textContent = mode === 'server'
-      ? serverLabels[apiSelectServer.value] || serverLabels['deepseek/']
-      : apiLabels[brand] || apiLabels['deepl-api'];
-    modeSummary.textContent = modeSummaries[mode] || modeSummaries.server;
+    modeBadge.textContent = getModeLabel(mode);
+    brandBadge.textContent = getBrandLabel(mode, brand, apiSelectServer.value);
+    modeSummary.textContent = i18n.t(currentLanguage, `options.modeSummaries.${mode}`);
   }
 
   function updateModeUI() {
@@ -119,6 +137,24 @@ document.addEventListener('DOMContentLoaded', () => {
     updateOverview();
   }
 
+  function renderLocalizedUi(items) {
+    currentLanguage = i18n.resolveUiLanguage(items[i18n.UI_LANGUAGE_KEY]);
+
+    theme.applyDocumentTheme(document, items[theme.THEME_MODE_KEY]);
+    document.documentElement.lang = currentLanguage;
+    document.title = i18n.t(currentLanguage, 'options.pageTitle');
+    i18n.applyTranslations(document, currentLanguage);
+
+    i18n.populateSelect(uiLanguageSelect, i18n.getUiLanguageOptions(currentLanguage), currentLanguage);
+    i18n.populateSelect(backendModelSelect, i18n.getBackendModeOptions(currentLanguage), items.backendMode);
+    i18n.populateSelect(httpMethodSelect, i18n.getHttpMethodOptions(currentLanguage), items.httpMethod);
+    i18n.populateSelect(apiSelectServer, i18n.getServerTargetOptions(currentLanguage), items.apiSelectServer);
+    i18n.populateSelect(apiSelect, i18n.getApiBrandOptions(currentLanguage), items.apiBrand);
+    i18n.populateSelect(endpointSelectDeepl, i18n.getDeeplEndpointOptions(currentLanguage), items.deeplEndpoint);
+
+    refreshVisibilityToggleLabels();
+  }
+
   function loadSavedSettings() {
     chrome.storage.local.get(defaults, (items) => {
       if (chrome.runtime.lastError) {
@@ -126,29 +162,30 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      backendModelSelect.value = items.backendMode;
+      renderLocalizedUi(items);
+
       serverUrlInput.value = items.serverUrl;
-      httpMethodSelect.value = items.httpMethod;
-      apiSelectServer.value = items.apiSelectServer;
-      apiSelect.value = items.apiBrand;
       apiKeyInputDeepl.value = items.deeplApiKey;
-      endpointSelectDeepl.value = items.deeplEndpoint;
       apiKeyInputDeepseek.value = items.deepseekApiKey;
 
       updateModeUI();
     });
   }
 
+  uiLanguageSelect.addEventListener('change', () => {
+    chrome.storage.local.set({ [i18n.UI_LANGUAGE_KEY]: uiLanguageSelect.value }, loadSavedSettings);
+  });
+
   backendModelSelect.addEventListener('change', () => {
-    chrome.storage.local.set({ backendMode: backendModelSelect.value }, updateModeUI);
+    chrome.storage.local.set({ backendMode: backendModelSelect.value }, loadSavedSettings);
   });
 
   apiSelectServer.addEventListener('change', () => {
-    chrome.storage.local.set({ apiSelectServer: apiSelectServer.value }, updateModeUI);
+    chrome.storage.local.set({ apiSelectServer: apiSelectServer.value }, loadSavedSettings);
   });
 
   apiSelect.addEventListener('change', () => {
-    chrome.storage.local.set({ apiBrand: apiSelect.value }, updateModeUI);
+    chrome.storage.local.set({ apiBrand: apiSelect.value }, loadSavedSettings);
   });
 
   saveBtnServer.addEventListener('click', () => {
@@ -157,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiServer = apiSelectServer.value.trim();
 
     if (!url) {
-      alert('请输入服务器 URL。');
+      alert(i18n.t(currentLanguage, 'options.alerts.serverUrlRequired'));
       serverUrlInput.focus();
       return;
     }
@@ -173,9 +210,9 @@ document.addEventListener('DOMContentLoaded', () => {
         apiSelectServer: apiServer
       },
       () => {
-        alert('服务器配置已保存。');
+        alert(i18n.t(currentLanguage, 'options.alerts.serverSaved'));
         serverUrlInput.value = url;
-        updateModeUI();
+        loadSavedSettings();
       }
     );
   });
@@ -185,8 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
       serverUrlInput.value = '';
       httpMethodSelect.value = defaults.httpMethod;
       apiSelectServer.value = defaults.apiSelectServer;
-      alert('服务器配置已清空。');
-      updateModeUI();
+      alert(i18n.t(currentLanguage, 'options.alerts.serverCleared'));
+      loadSavedSettings();
     });
   });
 
@@ -195,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const endpoint = endpointSelectDeepl.value || defaults.deeplEndpoint;
 
     if (!key) {
-      alert('请输入 DeepL API Key。');
+      alert(i18n.t(currentLanguage, 'options.alerts.deeplKeyRequired'));
       apiKeyInputDeepl.focus();
       return;
     }
@@ -206,8 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
         deeplEndpoint: endpoint
       },
       () => {
-        alert('DeepL 配置已保存。');
-        updateModeUI();
+        alert(i18n.t(currentLanguage, 'options.alerts.deeplSaved'));
+        loadSavedSettings();
       }
     );
   });
@@ -217,8 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
       apiKeyInputDeepl.value = '';
       endpointSelectDeepl.value = defaults.deeplEndpoint;
       resetInputVisibility('apiKey-deepl');
-      alert('DeepL 配置已清空。');
-      updateModeUI();
+      alert(i18n.t(currentLanguage, 'options.alerts.deeplCleared'));
+      loadSavedSettings();
     });
   });
 
@@ -226,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const key = apiKeyInputDeepseek.value.trim();
 
     if (!key) {
-      alert('请输入 Deepseek API Key。');
+      alert(i18n.t(currentLanguage, 'options.alerts.deepseekKeyRequired'));
       apiKeyInputDeepseek.focus();
       return;
     }
@@ -236,8 +273,8 @@ document.addEventListener('DOMContentLoaded', () => {
         deepseekApiKey: key
       },
       () => {
-        alert('Deepseek 配置已保存。');
-        updateModeUI();
+        alert(i18n.t(currentLanguage, 'options.alerts.deepseekSaved'));
+        loadSavedSettings();
       }
     );
   });
@@ -246,8 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.remove(['deepseekApiKey'], () => {
       apiKeyInputDeepseek.value = '';
       resetInputVisibility('apiKey-deepseek');
-      alert('Deepseek 配置已清空。');
-      updateModeUI();
+      alert(i18n.t(currentLanguage, 'options.alerts.deepseekCleared'));
+      loadSavedSettings();
     });
   });
 

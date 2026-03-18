@@ -19,6 +19,9 @@
   <a href="./README.md">
     <img src="https://img.shields.io/badge/Docs-English-111111?style=flat-square" alt="English README" />
   </a>
+  <a href="./README.zh-TW.md">
+    <img src="https://img.shields.io/badge/Docs-%E7%B9%81%E9%AB%94%E4%B8%AD%E6%96%87-111111?style=flat-square" alt="繁体中文 README" />
+  </a>
 </p>
 
 这是一个基于 Manifest V3 的原生 JavaScript Chrome 扩展，支持两种翻译工作流：
@@ -30,6 +33,7 @@
 
 - [功能特性](#功能特性)
 - [支持的目标语言](#支持的目标语言-)
+- [界面与本地化](#界面与本地化-)
 - [工作原理](#工作原理-)
 - [翻译模式](#翻译模式-)
 - [安装](#安装-)
@@ -38,6 +42,7 @@
 - [项目结构](#项目结构-)
 - [架构说明](#架构说明-)
 - [本地存储](#本地存储-)
+- [隐私政策](#隐私政策-)
 - [安全说明](#安全说明-)
 - [当前限制](#当前限制-)
 - [开发](#开发-)
@@ -50,6 +55,8 @@
 - 💬 页面内结果弹层支持 `复制` 和 `关闭`
 - ⚡ 提供快速设置 popup 用于常用切换
 - ⚙️ 提供完整 options 页面用于 API Key 和后端配置
+- 🌗 popup 内置浅色 / 深色切换，并在 popup、options 页面和页内翻译弹层之间共享主题
+- 🌍 支持三语言界面切换：English、简体中文、繁体中文
 - 🔤 支持 DeepL 直连 API
 - 🤖 支持 DeepSeek 直连 API
 - 📡 DeepSeek 直连模式支持可选流式输出
@@ -66,6 +73,13 @@
 - 法语 `FR`
 - 俄语 `RU`
 
+## 界面与本地化 🎨
+
+- 界面语言可在 `English`、`简体中文` 和 `繁体中文` 之间切换。
+- 语言设置会同时应用到 popup、options 页面和网页内的翻译浮层。
+- popup 提供主题切换按钮，可在浅色模式与深色模式之间切换。
+- 保存后的主题模式会同步到 popup、options 页面和 content script 创建的页内结果弹层。
+
 ## 工作原理 ⚙️
 
 ### 用户流程 🚀
@@ -81,9 +95,12 @@
 
 - `menu/` 是快速设置 popup：
   - 选择目标语言
+  - 选择界面语言
   - 切换 `server` 和 `api` 模式
   - 快速切换当前翻译来源
+  - 切换浅色 / 深色主题
 - `options/` 是完整设置页：
+  - 保存界面语言
   - 保存后端 URL 和后端端点类型
   - 保存 DeepL API Key 和 endpoint 类型
   - 保存 DeepSeek API Key
@@ -147,8 +164,10 @@
 你可以在 popup 中完成以下高频操作：
 
 - 选择目标语言
+- 选择界面语言
 - 选择 `自定义服务器` 或 `自定义 API`
 - 快速切换当前 provider
+- 切换浅色 / 深色主题
 
 Popup 界面概览：
 
@@ -193,6 +212,7 @@ Options 界面概览：
 可选：
 
 - UI 中提供了 HTTP Method 选择器
+- 也可以在 options 页面调整界面语言
 
 ## 使用说明 📝
 
@@ -201,7 +221,8 @@ Options 界面概览：
 - 当前实现中，选中文本长度超过 `2400` 字符会被拒绝。
 - 结果弹层支持手动复制。
 - 当前实现中，结果弹层不会自动定时关闭。
-- 当前 UI 主要为简体中文。
+- 界面支持 English、简体中文 和 繁体中文 三种语言。
+- 保存后的主题模式会复用到 popup、options 页面和页内翻译浮层。
 
 ## 项目结构 📁
 
@@ -221,7 +242,13 @@ Options 界面概览：
 ├─ options/
 │  ├─ options.html               # 完整设置页
 │  └─ options.js                 # 设置存储与界面切换逻辑
+├─ shared/
+│  ├─ i18n.js                    # 多语言资源与本地化辅助
+│  └─ theme.js                   # 浅色 / 深色主题辅助
 ├─ icons/
+├─ PrivacyPolicyAndSecure.md     # 隐私政策（英文）
+├─ PrivacyPolicyAndSecure.zh-CN.md
+├─ PrivacyPolicyAndSecure.zh-TW.md
 └─ manifest.json
 ```
 
@@ -247,6 +274,11 @@ Options 界面概览：
 - `deepseek_api.js`：请求 DeepSeek Chat Completions API
 - `server_api.js`：请求你自己的后端服务
 
+### `shared/*.js`
+
+- `i18n.js`：提供 English、简体中文、繁体中文 三套界面文案
+- `theme.js`：提供共享的浅色 / 深色主题状态与配色辅助
+
 ## 本地存储 💾
 
 扩展会把配置保存在 `chrome.storage.local` 中，包括：
@@ -258,6 +290,16 @@ Options 界面概览：
 - API keys
 - DeepL endpoint 选择
 - DeepSeek 流式开关
+- 界面语言
+- 主题模式
+
+## 隐私政策 🔒
+
+仓库中提供了三种语言版本的隐私政策文本：
+
+- [English](./PrivacyPolicyAndSecure.md)
+- [简体中文](./PrivacyPolicyAndSecure.zh-CN.md)
+- [繁体中文](./PrivacyPolicyAndSecure.zh-TW.md)
 
 ## 安全说明 🔐
 
@@ -270,7 +312,7 @@ Options 界面概览：
 ## 当前限制 ⚠️
 
 - Google Translate 尚未实现
-- UI 主要为简体中文
+- 当前截图主要展示简体中文界面
 - 当前没有自动化测试
 - 当前没有打包或发布流水线
 - 后端中转模式依赖你自己实现并维护后端契约

@@ -1,17 +1,142 @@
 (function () {
+  const i18n = globalThis.TranslateOnSelectI18n;
+  const theme = globalThis.TranslateOnSelectTheme;
+
+  if (!i18n) {
+    console.error('I18n helpers are unavailable in content script.');
+    return;
+  }
+
+  if (!theme) {
+    console.error('Theme helpers are unavailable in content script.');
+    return;
+  }
+
   const MAX_CHARS = 2400;
+  const defaultLanguage = i18n.detectInitialUiLanguage();
+  const defaultThemeMode = theme.DEFAULT_THEME_MODE;
+
+  let currentLanguage = defaultLanguage;
+  let currentThemeMode = defaultThemeMode;
   let floatBtn = null;
   let popup = null;
-  let popupTimeout = null; // 保留变量但不用于自动关闭
+  let popupTimeout = null;
   let lastSelectionText = '';
   let lastRangeRect = null;
-  let floatBtnTimeout = null; // 保留变量但不用于自动 hide
-
-  // 流式相关状态
+  let floatBtnTimeout = null;
   let streamingActive = false;
   let streamingBuffer = '';
+  let popupSystemState = null;
 
-  /* ------------------ UI helpers ------------------ */
+  function t(key, variables) {
+    return i18n.t(currentLanguage, key, variables);
+  }
+
+  function getThemePalette() {
+    return theme.getContentPalette(currentThemeMode);
+  }
+
+  function applyContentTone(contentEl) {
+    if (!contentEl) return;
+
+    const palette = getThemePalette();
+    const tone = contentEl.dataset.tone || 'normal';
+
+    contentEl.style.color = tone === 'error' ? palette.popupErrorText : palette.popupText;
+    contentEl.style.opacity = tone === 'loading' ? '0.72' : '1';
+  }
+
+  function stylePopupActionButton(button) {
+    if (!button) return;
+
+    const palette = getThemePalette();
+
+    button.style.border = palette.popupActionBorder;
+    button.style.background = palette.popupActionBackground;
+    button.style.color = palette.popupActionText;
+    button.style.boxShadow = palette.popupActionShadow;
+  }
+
+  function applyFloatButtonTheme() {
+    if (!floatBtn) return;
+
+    const palette = getThemePalette();
+
+    floatBtn.style.background = palette.floatButtonBackground;
+    floatBtn.style.color = palette.floatButtonText;
+    floatBtn.style.border = palette.floatButtonBorder;
+    floatBtn.style.boxShadow = palette.floatButtonShadow;
+  }
+
+  function applyPopupTheme() {
+    if (!popup) return;
+
+    const palette = getThemePalette();
+
+    popup.style.background = palette.popupBackground;
+    popup.style.color = palette.popupText;
+    popup.style.border = palette.popupBorder;
+    popup.style.boxShadow = palette.popupShadow;
+
+    applyContentTone(document.getElementById('qt-content'));
+    stylePopupActionButton(document.getElementById('qt-copy'));
+    stylePopupActionButton(document.getElementById('qt-close'));
+  }
+
+  function setPopupContentText(text, tone = 'normal') {
+    const contentEl = document.getElementById('qt-content');
+    if (!contentEl) return;
+
+    contentEl.innerText = text;
+    contentEl.dataset.tone = tone;
+    applyContentTone(contentEl);
+  }
+
+  function renderPopupSystemState() {
+    if (!popupSystemState) return;
+    setPopupContentText(t(popupSystemState.key, popupSystemState.variables), popupSystemState.tone);
+  }
+
+  function refreshOpenUi() {
+    if (floatBtn) {
+      floatBtn.textContent = t('content.translateButton');
+      applyFloatButtonTheme();
+    }
+
+    if (!popup) return;
+
+    const copyButton = document.getElementById('qt-copy');
+    const closeButton = document.getElementById('qt-close');
+
+    if (copyButton) {
+      copyButton.textContent = t('content.copyButton');
+    }
+
+    if (closeButton) {
+      closeButton.textContent = t('content.closeButton');
+    }
+
+    applyPopupTheme();
+
+    if (popupSystemState) {
+      renderPopupSystemState();
+    }
+  }
+
+  function loadUiPreferences() {
+    if (!chrome.storage || !chrome.storage.local) return;
+
+    chrome.storage.local.get({ [i18n.UI_LANGUAGE_KEY]: defaultLanguage, [theme.THEME_MODE_KEY]: defaultThemeMode }, (items) => {
+      if (chrome.runtime.lastError) {
+        console.error('Failed to load content script language:', chrome.runtime.lastError);
+        return;
+      }
+
+      currentLanguage = i18n.resolveUiLanguage(items[i18n.UI_LANGUAGE_KEY]);
+      currentThemeMode = theme.resolveThemeMode(items[theme.THEME_MODE_KEY]);
+      refreshOpenUi();
+    });
+  }
 
   function removeFloatBtn() {
     if (floatBtn) {
@@ -31,8 +156,8 @@
     floatBtn = document.createElement('button');
     floatBtn.id = 'qt-float-btn';
     floatBtn.type = 'button';
-    floatBtn.textContent = '翻译';
-    // style
+    floatBtn.textContent = t('content.translateButton');
+
     Object.assign(floatBtn.style, {
       position: 'absolute',
       left: `${x}px`,
@@ -41,45 +166,34 @@
       padding: '6px 10px',
       fontSize: '13px',
       borderRadius: '18px',
-      background: '#0a66ff',
-      color: '#fff',
-      border: 'none',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+      border: '1px solid transparent',
       cursor: 'pointer',
-      userSelect: 'none'
+      userSelect: 'none',
+      transition: 'transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease'
     });
 
-    // 点击按钮 -> 显示 popup 并开始翻译
-    floatBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      // 打开翻译窗口并开始翻译
+    floatBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
       try {
         showLoadingAtRect(lastRangeRect || { left: x, bottom: y + 24 });
-        // 触发翻译
         triggerTranslate(lastSelectionText);
       } finally {
-        // 按钮在用户点击后继续保留（若你想移除按钮，取消下面一行）
-        // removeFloatBtn();
+        // Keep the button after click so repeated translations stay convenient.
       }
     });
 
     document.body.appendChild(floatBtn);
+    applyFloatButtonTheme();
 
-    // 点击浮窗外不再自动移除按钮（但保留外部点击处理，以便手动关闭）
     setTimeout(() => {
       window.addEventListener('mousedown', outsideClickHandlerForBtn);
     }, 0);
-
-    // 取消自动隐藏：此前为 floatBtnTimeout = setTimeout(removeFloatBtn, 8000);
-    // 我们不再设置自动隐藏定时器
   }
 
-  function outsideClickHandlerForBtn(e) {
+  function outsideClickHandlerForBtn(event) {
     if (!floatBtn) return;
-    if (!floatBtn.contains(e.target)) {
-      // 如果你不想让外部点击关闭按钮，注释下一行
-      // removeFloatBtn();
-      // 我们保留外部点击关闭行为默认开启；若希望禁用，请注释上面一行
+    if (!floatBtn.contains(event.target)) {
+      // Intentionally keep the button visible until the selection changes.
     }
   }
 
@@ -93,12 +207,12 @@
       popupTimeout = null;
     }
     window.removeEventListener('mousedown', outsideClickHandlerForPopup);
-    // 清理流状态
     streamingActive = false;
     streamingBuffer = '';
+    popupSystemState = null;
   }
 
-  function createPopup(x, y, initialHtml = '') {
+  function createPopup(x, y) {
     removePopup();
 
     popup = document.createElement('div');
@@ -109,10 +223,7 @@
     popup.style.zIndex = 2147483647;
     popup.style.minWidth = '220px';
     popup.style.maxWidth = '520px';
-    popup.style.background = '#fff';
-    popup.style.color = '#111';
-    popup.style.border = '1px solid rgba(0,0,0,0.12)';
-    popup.style.boxShadow = '0 6px 18px rgba(0,0,0,0.12)';
+    popup.style.border = '1px solid transparent';
     popup.style.borderRadius = '8px';
     popup.style.padding = '8px';
     popup.style.fontFamily = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial';
@@ -120,65 +231,99 @@
     popup.style.lineHeight = '1.4';
     popup.style.backdropFilter = 'blur(2px)';
     popup.style.wordBreak = 'break-word';
-    popup.innerHTML = `
-      <div id="qt-content" style="min-height:20px">${initialHtml}</div>
-      <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
-        <button id="qt-copy" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0.08);background:#f5f5f5;cursor:pointer">复制</button>
-        <button id="qt-close" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0.08);background:#f5f5f5;cursor:pointer">关闭</button>
-      </div>
-    `;
-    document.body.appendChild(popup);
 
-    document.getElementById('qt-close').addEventListener('click', removePopup);
-    document.getElementById('qt-copy').addEventListener('click', async () => {
+    const content = document.createElement('div');
+    content.id = 'qt-content';
+    content.style.minHeight = '20px';
+    popup.appendChild(content);
+
+    const actionRow = document.createElement('div');
+    actionRow.style.display = 'flex';
+    actionRow.style.gap = '8px';
+    actionRow.style.marginTop = '8px';
+    actionRow.style.justifyContent = 'flex-end';
+
+    const copyButton = document.createElement('button');
+    copyButton.id = 'qt-copy';
+    copyButton.type = 'button';
+    copyButton.textContent = t('content.copyButton');
+    Object.assign(copyButton.style, {
+      padding: '4px 8px',
+      borderRadius: '6px',
+      border: '1px solid transparent',
+      cursor: 'pointer',
+      transition: 'border-color 160ms ease, box-shadow 160ms ease, background 160ms ease'
+    });
+
+    const closeButton = document.createElement('button');
+    closeButton.id = 'qt-close';
+    closeButton.type = 'button';
+    closeButton.textContent = t('content.closeButton');
+    Object.assign(closeButton.style, {
+      padding: '4px 8px',
+      borderRadius: '6px',
+      border: '1px solid transparent',
+      cursor: 'pointer',
+      transition: 'border-color 160ms ease, box-shadow 160ms ease, background 160ms ease'
+    });
+
+    actionRow.appendChild(copyButton);
+    actionRow.appendChild(closeButton);
+    popup.appendChild(actionRow);
+    document.body.appendChild(popup);
+    applyPopupTheme();
+
+    closeButton.addEventListener('click', removePopup);
+    copyButton.addEventListener('click', async () => {
       const text = document.getElementById('qt-content').innerText;
       try {
         await navigator.clipboard.writeText(text);
-      } catch (e) {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
+      } catch (error) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
         document.execCommand('copy');
-        ta.remove();
+        textarea.remove();
       }
     });
 
     setTimeout(() => {
       window.addEventListener('mousedown', outsideClickHandlerForPopup);
     }, 0);
-
-    // 取消自动 60s 关闭：此前 popupTimeout = setTimeout(removePopup, 60_000);
-    // 我们不再设置自动关闭定时器
   }
 
-  function outsideClickHandlerForPopup(e) {
+  function outsideClickHandlerForPopup(event) {
     if (!popup) return;
-    if (!popup.contains(e.target)) {
-      // 如果你不想让外部点击关闭弹窗，注释下一行
+    if (!popup.contains(event.target)) {
       removePopup();
     }
   }
 
-  function showLoadingAtRect(rect) {
+  function showSystemMessageAtRect(rect, key, variables = {}, tone = 'normal') {
     const pos = computePopupPosition(rect);
-    // 在开始流式前，显示一个 loading 提示（流式会继续更新内容）
-    createPopup(pos.x, pos.y, '<div style="opacity:0.7">翻译中…</div>');
+    createPopup(pos.x, pos.y);
+    popupSystemState = { key, variables, tone };
+    renderPopupSystemState();
   }
 
-  function showResultAtRect(rect, html) {
+  function showTranslatedResultAtRect(rect, text) {
     const pos = computePopupPosition(rect);
-    createPopup(pos.x, pos.y, html);
+    createPopup(pos.x, pos.y);
+    popupSystemState = null;
+    setPopupContentText(text, 'normal');
+  }
+
+  function showLoadingAtRect(rect) {
+    showSystemMessageAtRect(rect, 'content.loading', {}, 'loading');
   }
 
   function computePopupPosition(rect) {
-    // 计算弹窗位置：尽量放在选区下方并避免超出可视区域
     const padding = 8;
     const popupWidth = Math.min(520, Math.max(220, (rect && rect.width) || 300));
     let x = Math.max(padding, (rect ? rect.left : window.innerWidth / 2) + window.scrollX);
     let y = Math.max(padding, (rect ? rect.bottom : 120) + window.scrollY + 6);
 
-    // 如果溢出右侧，往左移动
     if (x + popupWidth + padding > window.scrollX + window.innerWidth) {
       x = window.scrollX + window.innerWidth - popupWidth - padding;
       if (x < padding) x = padding;
@@ -186,125 +331,116 @@
     return { x, y };
   }
 
-  function escapeHtml(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  /* ------------------ streaming message handler ------------------ */
-
-  // 处理来自 background 的流式消息（chrome.tabs.sendMessage）
-  chrome.runtime.onMessage.addListener((msg, sender) => {
+  chrome.runtime.onMessage.addListener((msg) => {
     try {
       if (!msg || msg.action !== 'translate_stream') return;
-      // 如果没有 popup，则创建一个基于 lastRangeRect 的 popup
+
       if (!popup) {
         showLoadingAtRect(lastRangeRect || { left: window.innerWidth / 2, bottom: 120 });
       }
 
-      const contentEl = document.getElementById('qt-content');
-      if (!contentEl) return;
-
-      // 处理错误/完成/分片
       if (msg.error) {
-        // 出错，显示错误并结束流
-        contentEl.innerText = `翻译失败：${msg.error}`;
+        popupSystemState = {
+          key: 'content.translationFailed',
+          variables: { error: String(msg.error) },
+          tone: 'error'
+        };
+        renderPopupSystemState();
         streamingActive = false;
         streamingBuffer = '';
         return;
       }
 
       if (msg.done) {
-        // 流结束（可能带 final 翻译）
         streamingActive = false;
-        if (msg.success && typeof msg.translated !== 'undefined') {
-          contentEl.innerText = msg.translated;
-        } else if (msg.message) {
-          contentEl.innerText = msg.message;
-        }
         streamingBuffer = '';
+
+        if (msg.success && typeof msg.translated !== 'undefined') {
+          popupSystemState = null;
+          setPopupContentText(String(msg.translated), 'normal');
+        } else if (typeof msg.message !== 'undefined') {
+          popupSystemState = null;
+          setPopupContentText(String(msg.message), 'normal');
+        }
         return;
       }
 
-      // 常规 chunk（可能是字符串）
       if (typeof msg.chunk !== 'undefined') {
         const chunkText = String(msg.chunk);
         streamingBuffer += chunkText;
-        // 实时更新 popup（escapeHtml 以避免注入）
-        contentEl.innerText = streamingBuffer;
+        popupSystemState = null;
+        setPopupContentText(streamingBuffer, 'normal');
         streamingActive = true;
       }
-    } catch (e) {
-      console.error('stream handler error:', e);
+    } catch (error) {
+      console.error('stream handler error:', error);
     }
   });
-
-  /* ------------------ messaging ------------------ */
 
   function sendTranslateMessage(text) {
     return new Promise((resolve) => {
       try {
         chrome.runtime.sendMessage(
           { action: 'translate', text },
-          (resp) => {
+          (response) => {
             if (chrome.runtime.lastError) {
               resolve({ success: false, error: chrome.runtime.lastError.message });
               return;
             }
-            if (!resp) {
+            if (!response) {
               resolve({ success: false, error: 'no_response_from_background' });
               return;
             }
-            resolve(resp);
+            resolve(response);
           }
         );
-      } catch (err) {
-        resolve({ success: false, error: err && err.message ? err.message : String(err) });
+      } catch (error) {
+        resolve({ success: false, error: error && error.message ? error.message : String(error) });
       }
     });
   }
 
   async function triggerTranslate(text) {
     if (!text) {
-      showResultAtRect(lastRangeRect || { left: window.innerWidth / 2, bottom: 120 }, `<div>没有选中文本。</div>`);
+      showSystemMessageAtRect(
+        lastRangeRect || { left: window.innerWidth / 2, bottom: 120 },
+        'content.noSelection'
+      );
       return;
     }
 
-    // 初始化流状态
     streamingActive = false;
     streamingBuffer = '';
 
-    // 显示 loading（已在 click 时创建） - ensure popup exists
     showLoadingAtRect(lastRangeRect || { left: window.innerWidth / 2, bottom: 120 });
 
-    // 发送翻译请求（后端可能以流式同时用 chrome.tabs.sendMessage 返回 chunk）
-    const resp = await sendTranslateMessage(text);
-    if (!resp || !resp.success) {
-      const errMsg = resp && resp.error ? escapeHtml(resp.error) : '未知错误';
-      showResultAtRect(lastRangeRect || { left: window.innerWidth / 2, bottom: 120 }, `<div style="color:#b00">翻译失败：${errMsg}</div>`);
+    const response = await sendTranslateMessage(text);
+    if (!response || !response.success) {
+      const errorMessage = response && response.error ? String(response.error) : 'unknown_error';
+      showSystemMessageAtRect(
+        lastRangeRect || { left: window.innerWidth / 2, bottom: 120 },
+        'content.translationFailed',
+        { error: errorMessage },
+        'error'
+      );
       return;
     }
 
-    // 若后端不是流式或作为最终结果返回，显示最终翻译（兼容性）
-    const safeHtml = escapeHtml(resp.translated);
-    showResultAtRect(lastRangeRect || { left: window.innerWidth / 2, bottom: 120 }, `<div>${safeHtml}</div>`);
+    showTranslatedResultAtRect(
+      lastRangeRect || { left: window.innerWidth / 2, bottom: 120 },
+      String(response.translated || '')
+    );
   }
 
-  /* ------------------ selection handling ------------------ */
-
   function handleSelectionShowButton() {
-    // 处理选区并显示浮动按钮（不立即翻译）
     const selection = window.getSelection();
     if (!selection) {
       lastSelectionText = '';
       lastRangeRect = null;
-      // 不自动移除按钮，这里仍然保留移除逻辑以避免悬浮遗留在无选区时
       removeFloatBtn();
       return;
     }
+
     const text = selection.toString().trim();
     if (!text) {
       lastSelectionText = '';
@@ -314,46 +450,42 @@
     }
 
     if (text.length > MAX_CHARS) {
-      // 文本过长：提示并不显示按钮
       lastSelectionText = '';
       lastRangeRect = null;
       removeFloatBtn();
-      // 轻量提示：直接在页面显示临时 popup（不自动翻译）
+
       try {
         const rect = selection.getRangeAt(0).getBoundingClientRect();
-        showResultAtRect(rect, `<div>文本过长（> ${MAX_CHARS} 字符），请缩短选区。</div>`);
-        // 不再自动移除提示，用户需手动关闭弹窗
-      } catch (e) {}
+        showSystemMessageAtRect(rect, 'content.textTooLong', { max: MAX_CHARS });
+      } catch (error) {
+        // Ignore range lookup failures for collapsed or detached selections.
+      }
       return;
     }
 
-    // 获取选区位置（用于放置按钮）
     let rect;
     try {
       rect = selection.getRangeAt(0).getBoundingClientRect();
-    } catch (e) {
+    } catch (error) {
       rect = { left: window.innerWidth / 2, bottom: 120, width: 200 };
     }
 
     lastSelectionText = text;
     lastRangeRect = rect;
 
-    // 按钮位置：放在选区右上方或右下方（如果右侧空间不足则放左侧）
     const padding = 6;
     const btnWidth = 64;
     const btnHeight = 32;
     const scrollX = window.scrollX || 0;
     const scrollY = window.scrollY || 0;
 
-    let btnX = rect.right + scrollX - btnWidth; // 默认靠右
-    let btnY = rect.top + scrollY - btnHeight - 6; // 默认放在上方
+    let btnX = rect.right + scrollX - btnWidth;
+    let btnY = rect.top + scrollY - btnHeight - 6;
 
-    // 若上方放不下，则放到下方
     if (btnY < scrollY + padding) {
       btnY = rect.bottom + scrollY + 6;
     }
 
-    // 确保不超出右侧
     if (btnX + btnWidth + padding > scrollX + window.innerWidth) {
       btnX = scrollX + window.innerWidth - btnWidth - padding;
     }
@@ -362,9 +494,6 @@
     createFloatBtn(btnX, btnY);
   }
 
-  /* ------------------ event listeners ------------------ */
-
-  // mouseup / touchend 触发划词检测（延迟一点以稳定 selection）
   document.addEventListener('mouseup', () => {
     setTimeout(handleSelectionShowButton, 10);
   });
@@ -373,18 +502,33 @@
     setTimeout(handleSelectionShowButton, 10);
   });
 
-  // Esc 关闭所有浮层
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
       removeFloatBtn();
       removePopup();
     }
   });
 
-  // 保证卸载时清理
+  if (chrome.storage && chrome.storage.onChanged) {
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName !== 'local') return;
+
+      if (changes[i18n.UI_LANGUAGE_KEY]) {
+        currentLanguage = i18n.resolveUiLanguage(changes[i18n.UI_LANGUAGE_KEY].newValue || defaultLanguage);
+      }
+
+      if (changes[theme.THEME_MODE_KEY]) {
+        currentThemeMode = theme.resolveThemeMode(changes[theme.THEME_MODE_KEY].newValue || defaultThemeMode);
+      }
+
+      refreshOpenUi();
+    });
+  }
+
   window.addEventListener('unload', () => {
     removeFloatBtn();
     removePopup();
   });
 
+  loadUiPreferences();
 })();

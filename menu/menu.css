@@ -6,12 +6,57 @@
   --ink-soft: #5f6c72;
   --panel: rgba(255, 255, 255, 0.9);
   --panel-strong: rgba(255, 255, 255, 1);
+  --panel-border: rgba(24, 38, 44, 0.08);
   --line: rgba(24, 38, 44, 0.1);
   --accent: #c65b2e;
+  --accent-soft: rgba(198, 91, 46, 0.12);
   --shadow: 0 10px 22px rgba(24, 38, 44, 0.08);
+  --eyebrow: rgba(24, 38, 44, 0.5);
+  --select-arrow: rgba(24, 38, 44, 0.55);
+  --control-bg: rgba(255, 255, 255, 0.72);
+  --control-border: rgba(24, 38, 44, 0.14);
+  --control-shadow: 0 6px 14px rgba(24, 38, 44, 0.06);
+  --theme-button-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 239, 229, 0.92));
+  --theme-button-border: rgba(24, 38, 44, 0.12);
+  --theme-button-shadow: 0 8px 18px rgba(24, 38, 44, 0.08);
+  --theme-icon-fill: #f4b45f;
+  --theme-icon-glow: rgba(244, 180, 95, 0.22);
+  --theme-icon-ring: rgba(244, 180, 95, 0.56);
+  --theme-icon-shell: rgba(255, 255, 255, 0);
+  --theme-rays-opacity: 1;
+  --theme-cutout-opacity: 0;
   --radius-xl: 16px;
   --radius-md: 12px;
   font-family: "Segoe UI Variable", "Noto Sans SC", "PingFang SC", "Microsoft YaHei UI", sans-serif;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-top: #111821;
+  --bg-bottom: #18222d;
+  --ink-strong: #f3ede6;
+  --ink-soft: #aab4bc;
+  --panel: rgba(19, 25, 31, 0.92);
+  --panel-strong: rgba(28, 35, 42, 0.98);
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --line: rgba(255, 255, 255, 0.12);
+  --accent: #ef9851;
+  --accent-soft: rgba(239, 152, 81, 0.18);
+  --shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
+  --eyebrow: rgba(243, 237, 230, 0.58);
+  --select-arrow: rgba(243, 237, 230, 0.58);
+  --control-bg: rgba(255, 255, 255, 0.06);
+  --control-border: rgba(255, 255, 255, 0.12);
+  --control-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+  --theme-button-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+  --theme-button-border: rgba(255, 255, 255, 0.12);
+  --theme-button-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+  --theme-icon-fill: #f8ddb0;
+  --theme-icon-glow: rgba(248, 221, 176, 0.12);
+  --theme-icon-ring: rgba(248, 221, 176, 0);
+  --theme-icon-shell: #20303e;
+  --theme-rays-opacity: 0;
+  --theme-cutout-opacity: 1;
 }
 
 * {
@@ -20,8 +65,8 @@
 
 body {
   margin: 0;
-  width: 216px;
-  min-width: 216px;
+  width: 264px;
+  min-width: 264px;
   background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
   color: var(--ink-strong);
 }
@@ -62,7 +107,7 @@ select {
   position: relative;
   z-index: 1;
   backdrop-filter: blur(6px);
-  border: 1px solid rgba(24, 38, 44, 0.08);
+  border: 1px solid var(--panel-border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
   animation: rise-in 420ms ease both;
@@ -78,7 +123,7 @@ select {
   font-size: 9px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(24, 38, 44, 0.5);
+  color: var(--eyebrow);
 }
 
 .panel-header {
@@ -113,8 +158,8 @@ select {
   right: 12px;
   width: 6px;
   height: 6px;
-  border-right: 2px solid rgba(24, 38, 44, 0.55);
-  border-bottom: 2px solid rgba(24, 38, 44, 0.55);
+  border-right: 2px solid var(--select-arrow);
+  border-bottom: 2px solid var(--select-arrow);
   transform: translateY(-65%) rotate(45deg);
   pointer-events: none;
 }
@@ -141,7 +186,7 @@ select:hover {
 select:focus {
   outline: none;
   border-color: rgba(198, 91, 46, 0.55);
-  box-shadow: 0 0 0 4px rgba(198, 91, 46, 0.12);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
 .footer-bar {
@@ -156,20 +201,27 @@ select:focus {
 
 .storage-note {
   margin: 0;
-  max-width: 140px;
+  max-width: 132px;
   font-size: 10px;
   line-height: 1.25;
   color: var(--ink-soft);
 }
 
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 .ghost-button {
   min-height: 25px;
   padding: 0 8px;
-  border: 1px solid rgba(24, 38, 44, 0.14);
+  border: 1px solid var(--control-border);
   border-radius: var(--radius-xl);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--control-bg);
   color: var(--ink-strong);
-  box-shadow: 0 6px 14px rgba(24, 38, 44, 0.06);
+  box-shadow: var(--control-shadow);
   cursor: pointer;
   font-size: 11px;
   transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
@@ -178,12 +230,75 @@ select:focus {
 .ghost-button:hover {
   transform: translateY(-1px);
   border-color: rgba(198, 91, 46, 0.36);
-  box-shadow: 0 8px 16px rgba(24, 38, 44, 0.08);
+  box-shadow: 0 8px 16px rgba(24, 38, 44, 0.12);
 }
 
 .ghost-button:focus {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(198, 91, 46, 0.12);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.theme-toggle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--theme-button-border);
+  border-radius: 999px;
+  background: var(--theme-button-bg);
+  box-shadow: var(--theme-button-shadow);
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+  border-color: rgba(198, 91, 46, 0.36);
+  box-shadow: 0 10px 22px rgba(24, 38, 44, 0.14);
+}
+
+.theme-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--accent-soft), var(--theme-button-shadow);
+}
+
+.theme-toggle-icon {
+  position: relative;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: var(--theme-icon-fill);
+  box-shadow: 0 0 0 4px var(--theme-icon-glow);
+  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+}
+
+.theme-toggle-icon::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 2px dotted var(--theme-icon-ring);
+  border-radius: 999px;
+  opacity: var(--theme-rays-opacity);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.theme-toggle-icon::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 4px;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: var(--theme-icon-shell);
+  opacity: var(--theme-cutout-opacity);
+  transition: opacity 220ms ease, transform 220ms ease, background 220ms ease;
+}
+
+:root[data-theme="dark"] .theme-toggle-icon {
+  transform: translateX(-1px);
 }
 
 @keyframes rise-in {

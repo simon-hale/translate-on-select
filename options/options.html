@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Translate on Select - 设置</title>
+    <title data-i18n="options.pageTitle">Translate on Select - 设置</title>
     <link rel="stylesheet" href="options.css" />
   </head>
 
@@ -15,26 +15,31 @@
       <header class="hero-card">
         <div class="hero-copy">
           <p class="eyebrow">Translate on Select</p>
-          <h1>扩展设置</h1>
-          <p class="hero-text">管理模式、服务器地址和 API Key。</p>
+          <h1 data-i18n="options.heading">扩展设置</h1>
+          <p class="hero-text" data-i18n="options.heroText">管理模式、服务器地址和 API Key。</p>
 
           <div class="hero-badges">
             <span class="hero-badge">
-              <span class="badge-label">当前模式</span>
+              <span class="badge-label" data-i18n="options.currentModeLabel">当前模式</span>
               <strong id="modeBadge">自定义服务器</strong>
             </span>
             <span class="hero-badge">
-              <span class="badge-label">当前来源</span>
+              <span class="badge-label" data-i18n="options.currentSourceLabel">当前来源</span>
               <strong id="brandBadge">Deepseek V3 Chat</strong>
             </span>
           </div>
         </div>
 
         <div class="hero-side">
-          <img class="hero-icon" src="../icons/icon_128.png" alt="Translate on Select 图标" />
+          <img
+            class="hero-icon"
+            src="../icons/icon_128.png"
+            data-i18n-alt="options.iconAlt"
+            alt="Translate on Select 图标"
+          />
           <div class="side-card">
-            <span class="side-title">本地存储</span>
-            <p>配置只保存在当前浏览器。</p>
+            <span class="side-title" data-i18n="options.localStorageLabel">本地存储</span>
+            <p data-i18n="options.localStorageText">配置只保存在当前浏览器。</p>
           </div>
         </div>
       </header>
@@ -42,17 +47,17 @@
       <section class="content-grid">
         <aside class="info-panel">
           <div class="info-card">
-            <h2>建议</h2>
-            <p>有自建中转服务时，优先使用服务器模式。</p>
+            <h2 data-i18n="options.recommendationTitle">建议</h2>
+            <p data-i18n="options.recommendationText">有自建中转服务时，优先使用服务器模式。</p>
           </div>
 
           <div class="info-card warm">
-            <h2>安全</h2>
-            <p>不要公开带有 API Key 的截图或配置。</p>
+            <h2 data-i18n="options.securityTitle">安全</h2>
+            <p data-i18n="options.securityText">不要公开带有 API Key 的截图或配置。</p>
           </div>
 
           <div class="info-card">
-            <h2>当前模式</h2>
+            <h2 data-i18n="options.currentModeTitle">当前模式</h2>
             <p id="modeSummary">当前为服务器模式。</p>
           </div>
         </aside>
@@ -61,20 +66,25 @@
           <section class="settings-card">
             <div class="card-head">
               <div>
-                <p class="section-kicker">Mode</p>
-                <h2>翻译模式</h2>
+                <p class="section-kicker" data-i18n="options.generalKicker">General</p>
+                <h2 data-i18n="options.generalTitle">基础设置</h2>
               </div>
-              <p class="card-copy">先选模式，再填对应配置。</p>
+              <p class="card-copy" data-i18n="options.generalCopy">先选择界面语言，再配置翻译模式。</p>
             </div>
 
             <div class="field">
-              <label class="field-label" for="modeSelect">工作模式</label>
-              <span class="field-hint">服务器模式走后端，API 模式直连第三方。</span>
+              <label class="field-label" for="uiLanguageSelect" data-i18n="menu.uiLanguageLabel">界面语言</label>
+              <span class="field-hint" data-i18n="options.uiLanguageHint">会同时应用到弹窗、设置页和网页内翻译浮层。</span>
               <div class="select-wrap">
-                <select id="modeSelect">
-                  <option value="server" selected>自定义服务器</option>
-                  <option value="api">自定义 API</option>
-                </select>
+                <select id="uiLanguageSelect" data-i18n-aria-label="menu.uiLanguageLabel"></select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="modeSelect" data-i18n="options.modeLabel">工作模式</label>
+              <span class="field-hint" data-i18n="options.modeHint">服务器模式走后端，API 模式直连第三方。</span>
+              <div class="select-wrap">
+                <select id="modeSelect" data-i18n-aria-label="options.modeLabel"></select>
               </div>
             </div>
           </section>
@@ -82,15 +92,15 @@
           <section id="serverSection" class="settings-card section-card" hidden>
             <div class="card-head">
               <div>
-                <p class="section-kicker">Server</p>
-                <h2>服务器</h2>
+                <p class="section-kicker" data-i18n="options.serverKicker">Server</p>
+                <h2 data-i18n="options.serverTitle">服务器</h2>
               </div>
-              <p class="card-copy">填写地址、请求方式和服务类型。</p>
+              <p class="card-copy" data-i18n="options.serverCopy">填写地址、请求方式和服务类型。</p>
             </div>
 
             <div class="field-grid">
               <div class="field">
-                <label class="field-label" for="server">服务器 URL</label>
+                <label class="field-label" for="server" data-i18n="options.serverUrlLabel">服务器 URL</label>
                 <input
                   id="server"
                   type="text"
@@ -101,55 +111,45 @@
               </div>
 
               <div class="field">
-                <label class="field-label" for="HTTPMethods">请求方法</label>
+                <label class="field-label" for="HTTPMethods" data-i18n="options.requestMethodLabel">请求方法</label>
                 <div class="select-wrap">
-                  <select id="HTTPMethods">
-                    <option value="POST" selected>POST</option>
-                    <option value="GET">GET</option>
-                  </select>
+                  <select id="HTTPMethods" data-i18n-aria-label="options.requestMethodLabel"></select>
                 </div>
               </div>
             </div>
 
             <div class="field">
-              <label class="field-label" for="apiSelectServer">服务端点类型</label>
-              <span class="field-hint">选择当前服务端类型。</span>
+              <label class="field-label" for="apiSelectServer" data-i18n="options.serverEndpointLabel">服务端点类型</label>
+              <span class="field-hint" data-i18n="options.serverEndpointHint">选择当前服务端所使用的类型。</span>
               <div class="select-wrap">
-                <select id="apiSelectServer">
-                  <option value="deepseek/" selected>Deepseek V3 Chat</option>
-                  <option value="deepl/">DeepL - 自动识别账号类型</option>
-                </select>
+                <select id="apiSelectServer" data-i18n-aria-label="options.serverEndpointLabel"></select>
               </div>
             </div>
 
             <div class="action-row">
-              <button id="saveBtn-server" class="button primary" type="button">保存配置</button>
-              <button id="clearBtn-server" class="button secondary" type="button">清空</button>
+              <button id="saveBtn-server" class="button primary" type="button" data-i18n="options.saveSettingsButton">保存配置</button>
+              <button id="clearBtn-server" class="button secondary" type="button" data-i18n="options.clearButton">清空</button>
             </div>
 
             <div class="notice">
-              <strong>提示</strong>
-              <p>保存时会自动补全末尾的 `/`。</p>
+              <strong data-i18n="options.noteTitle">提示</strong>
+              <p data-i18n="options.noteText">保存时会自动补全末尾的 `/`。</p>
             </div>
           </section>
 
           <section id="apiSection" class="settings-card section-card" hidden>
             <div class="card-head">
               <div>
-                <p class="section-kicker">API</p>
-                <h2>API 品牌</h2>
+                <p class="section-kicker" data-i18n="options.apiKicker">API</p>
+                <h2 data-i18n="options.apiTitle">API 品牌</h2>
               </div>
-              <p class="card-copy">切换后显示对应配置。</p>
+              <p class="card-copy" data-i18n="options.apiCopy">切换后显示对应配置。</p>
             </div>
 
             <div class="field">
-              <label class="field-label" for="apiSelect">当前品牌</label>
+              <label class="field-label" for="apiSelect" data-i18n="options.apiBrandLabel">当前品牌</label>
               <div class="select-wrap">
-                <select id="apiSelect">
-                  <option value="deepl-api" selected>DeepL</option>
-                  <option value="deepseek-api">Deepseek V3 Chat</option>
-                  <option value="google-api">Google Translate</option>
-                </select>
+                <select id="apiSelect" data-i18n-aria-label="options.apiBrandLabel"></select>
               </div>
             </div>
           </section>
@@ -157,14 +157,14 @@
           <section id="deeplApiSection" class="settings-card section-card" hidden>
             <div class="card-head">
               <div>
-                <p class="section-kicker">DeepL</p>
-                <h2>DeepL</h2>
+                <p class="section-kicker" data-i18n="options.deeplKicker">DeepL</p>
+                <h2 data-i18n="options.deeplTitle">DeepL</h2>
               </div>
-              <p class="card-copy">保存 DeepL Key 与 endpoint。</p>
+              <p class="card-copy" data-i18n="options.deeplCopy">保存 DeepL Key 与 endpoint。</p>
             </div>
 
             <div class="field">
-              <label class="field-label" for="apiKey-deepl">API Key</label>
+              <label class="field-label" for="apiKey-deepl" data-i18n="options.apiKeyLabel">API Key</label>
               <div class="input-action-wrap">
                 <input
                   id="apiKey-deepl"
@@ -177,9 +177,8 @@
                   class="input-visibility-toggle"
                   type="button"
                   data-target="apiKey-deepl"
-                  data-label="DeepL API Key"
+                  data-label-key="options.apiKeyLabel"
                   aria-pressed="false"
-                  aria-label="显示 DeepL API Key"
                 >
                   显示
                 </button>
@@ -187,33 +186,29 @@
             </div>
 
             <div class="field">
-              <label class="field-label" for="endpoint-deepl">Endpoint</label>
+              <label class="field-label" for="endpoint-deepl" data-i18n="options.endpointLabel">Endpoint</label>
               <div class="select-wrap">
-                <select id="endpoint-deepl">
-                  <option value="free-deepl" selected>DeepL Free</option>
-                  <option value="pro-deepl">DeepL Pro</option>
-                </select>
+                <select id="endpoint-deepl" data-i18n-aria-label="options.endpointLabel"></select>
               </div>
             </div>
 
             <div class="action-row">
-              <button id="saveBtn-deepl" class="button primary" type="button">保存配置</button>
-              <button id="clearBtn-deepl" class="button secondary" type="button">清空 Key</button>
+              <button id="saveBtn-deepl" class="button primary" type="button" data-i18n="options.saveSettingsButton">保存配置</button>
+              <button id="clearBtn-deepl" class="button secondary" type="button" data-i18n="options.clearKeyButton">清空 Key</button>
             </div>
-
           </section>
 
           <section id="deepseekApiSection" class="settings-card section-card" hidden>
             <div class="card-head">
               <div>
-                <p class="section-kicker">Deepseek</p>
-                <h2>Deepseek</h2>
+                <p class="section-kicker" data-i18n="options.deepseekKicker">Deepseek</p>
+                <h2 data-i18n="options.deepseekTitle">Deepseek</h2>
               </div>
-              <p class="card-copy">保存 Deepseek Key。</p>
+              <p class="card-copy" data-i18n="options.deepseekCopy">保存 Deepseek Key。</p>
             </div>
 
             <div class="field">
-              <label class="field-label" for="apiKey-deepseek">API Key</label>
+              <label class="field-label" for="apiKey-deepseek" data-i18n="options.apiKeyLabel">API Key</label>
               <div class="input-action-wrap">
                 <input
                   id="apiKey-deepseek"
@@ -226,9 +221,8 @@
                   class="input-visibility-toggle"
                   type="button"
                   data-target="apiKey-deepseek"
-                  data-label="Deepseek API Key"
+                  data-label-key="options.apiKeyLabel"
                   aria-pressed="false"
-                  aria-label="显示 Deepseek API Key"
                 >
                   显示
                 </button>
@@ -236,29 +230,31 @@
             </div>
 
             <div class="action-row">
-              <button id="saveBtn-deepseek" class="button primary" type="button">保存配置</button>
-              <button id="clearBtn-deepseek" class="button secondary" type="button">清空 Key</button>
+              <button id="saveBtn-deepseek" class="button primary" type="button" data-i18n="options.saveSettingsButton">保存配置</button>
+              <button id="clearBtn-deepseek" class="button secondary" type="button" data-i18n="options.clearKeyButton">清空 Key</button>
             </div>
           </section>
 
           <section id="googleApiSection" class="settings-card section-card" hidden>
             <div class="card-head">
               <div>
-                <p class="section-kicker">Google</p>
-                <h2>Google</h2>
+                <p class="section-kicker" data-i18n="options.googleKicker">Google</p>
+                <h2 data-i18n="options.googleTitle">Google</h2>
               </div>
-              <p class="card-copy">入口已预留，暂未接入。</p>
+              <p class="card-copy" data-i18n="options.googleCopy">入口已预留，暂未接入。</p>
             </div>
 
             <div class="empty-state">
-              <strong>尚未适配</strong>
-              <p>后续可在这里补充配置项。</p>
+              <strong data-i18n="options.notImplementedTitle">尚未适配</strong>
+              <p data-i18n="options.notImplementedText">后续可在这里补充配置项。</p>
             </div>
           </section>
         </div>
       </section>
     </main>
 
+    <script src="../shared/i18n.js"></script>
+    <script src="../shared/theme.js"></script>
     <script src="options.js"></script>
   </body>
 </html>

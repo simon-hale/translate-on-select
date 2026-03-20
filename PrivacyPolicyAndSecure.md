@@ -2,6 +2,8 @@
 
 Updated: 2026-03-17
 
+Languages: **English** | [简体中文](./PrivacyPolicyAndSecure.zh-CN.md) | [繁體中文](./PrivacyPolicyAndSecure.zh-TW.md)
+
 This disclosure applies to the current implementation version of the `Translate-on-Select` Chrome extension.
 
 The sole purpose of this extension is to translate text that a user actively selects on a webpage into the user’s chosen target language. To provide this functionality, the extension processes certain data related to webpage content, translation requests, and local settings. In accordance with Chrome Web Store requirements regarding user data, privacy policies, and secure handling, this disclosure explains what data the extension processes, how it uses that data, who it may share that data with, how long the data is retained, and how users can control or delete that data.

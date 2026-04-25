@@ -25,13 +25,17 @@
           'api': 'Custom API'
         },
         'serverTargets': {
-          'deepseek/': 'Deepseek V3 Chat',
+          'deepseek/': 'Deepseek V4',
           'deepl/': 'DeepL'
         },
         'apiBrands': {
           'deepl-api': 'DeepL',
-          'deepseek-api': 'Deepseek V3 Chat',
+          'deepseek-api': 'Deepseek V4',
           'google-api': 'Google Translate'
+        },
+        'deepseekModels': {
+          'deepseek-v4-flash': 'Flash',
+          'deepseek-v4-pro': 'Pro'
         },
         'streamModes': {
           'true': 'Streaming',
@@ -54,6 +58,7 @@
         'quickModeLabel': 'Quick Mode',
         'quickServerLabel': 'Server Endpoint',
         'quickApiLabel': 'API Source',
+        'deepseekModelLabel': 'Deepseek V4 Model',
         'streamModeLabel': 'Deepseek Output Mode',
         'storageNote': 'Settings are stored locally only.',
         'moreSettingsButton': 'More Settings'
@@ -93,6 +98,7 @@
         'apiTitle': 'API Brand',
         'apiCopy': 'The matching configuration card appears after switching.',
         'apiBrandLabel': 'Current Brand',
+        'deepseekModelLabel': 'Deepseek V4 Model',
         'deeplKicker': 'DeepL',
         'deeplTitle': 'DeepL',
         'deeplCopy': 'Save the DeepL key and endpoint.',
@@ -161,13 +167,17 @@
           'api': '自定义 API'
         },
         'serverTargets': {
-          'deepseek/': 'Deepseek V3 Chat',
+          'deepseek/': 'Deepseek V4',
           'deepl/': 'DeepL'
         },
         'apiBrands': {
           'deepl-api': 'DeepL',
-          'deepseek-api': 'Deepseek V3 Chat',
+          'deepseek-api': 'Deepseek V4',
           'google-api': 'Google Translate'
+        },
+        'deepseekModels': {
+          'deepseek-v4-flash': 'Flash',
+          'deepseek-v4-pro': 'Pro'
         },
         'streamModes': {
           'true': '流式输出',
@@ -190,6 +200,7 @@
         'quickModeLabel': '快速切换模式',
         'quickServerLabel': '服务器端点',
         'quickApiLabel': 'API 来源',
+        'deepseekModelLabel': 'Deepseek V4 模型',
         'streamModeLabel': 'Deepseek 输出模式',
         'storageNote': '配置仅保存在本地。',
         'moreSettingsButton': '更多设置'
@@ -229,6 +240,7 @@
         'apiTitle': 'API 品牌',
         'apiCopy': '切换后显示对应配置。',
         'apiBrandLabel': '当前品牌',
+        'deepseekModelLabel': 'Deepseek V4 模型',
         'deeplKicker': 'DeepL',
         'deeplTitle': 'DeepL',
         'deeplCopy': '保存 DeepL Key 与 endpoint。',
@@ -297,13 +309,17 @@
           'api': '自訂 API'
         },
         'serverTargets': {
-          'deepseek/': 'Deepseek V3 Chat',
+          'deepseek/': 'Deepseek V4',
           'deepl/': 'DeepL'
         },
         'apiBrands': {
           'deepl-api': 'DeepL',
-          'deepseek-api': 'Deepseek V3 Chat',
+          'deepseek-api': 'Deepseek V4',
           'google-api': 'Google Translate'
+        },
+        'deepseekModels': {
+          'deepseek-v4-flash': 'Flash',
+          'deepseek-v4-pro': 'Pro'
         },
         'streamModes': {
           'true': '串流輸出',
@@ -326,6 +342,7 @@
         'quickModeLabel': '快速切換模式',
         'quickServerLabel': '伺服器端點',
         'quickApiLabel': 'API 來源',
+        'deepseekModelLabel': 'Deepseek V4 模型',
         'streamModeLabel': 'Deepseek 輸出模式',
         'storageNote': '設定只會儲存在本機。',
         'moreSettingsButton': '更多設定'
@@ -365,6 +382,7 @@
         'apiTitle': 'API 品牌',
         'apiCopy': '切換後會顯示對應設定。',
         'apiBrandLabel': '目前品牌',
+        'deepseekModelLabel': 'Deepseek V4 模型',
         'deeplKicker': 'DeepL',
         'deeplTitle': 'DeepL',
         'deeplCopy': '儲存 DeepL Key 與 endpoint。',
@@ -418,6 +436,7 @@
   const backendModeValues = ['server', 'api'];
   const serverTargetValues = ['deepseek/', 'deepl/'];
   const apiBrandValues = ['deepl-api', 'deepseek-api', 'google-api'];
+  const deepseekModelValues = ['deepseek-v4-flash', 'deepseek-v4-pro'];
   const streamModeValues = ['true', 'false'];
   const httpMethodValues = ['POST', 'GET'];
   const deeplEndpointValues = ['free-deepl', 'pro-deepl'];
@@ -575,6 +594,10 @@
     return createOptions(language, 'shared.apiBrands', apiBrandValues);
   }
 
+  function getDeepseekModelOptions(language) {
+    return createOptions(language, 'shared.deepseekModels', deepseekModelValues);
+  }
+
   function getStreamModeOptions(language) {
     return createOptions(language, 'shared.streamModes', streamModeValues);
   }
@@ -601,6 +624,7 @@
     'getBackendModeOptions': getBackendModeOptions,
     'getServerTargetOptions': getServerTargetOptions,
     'getApiBrandOptions': getApiBrandOptions,
+    'getDeepseekModelOptions': getDeepseekModelOptions,
     'getStreamModeOptions': getStreamModeOptions,
     'getHttpMethodOptions': getHttpMethodOptions,
     'getDeeplEndpointOptions': getDeeplEndpointOptions

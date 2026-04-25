@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     apiBrand: 'deepseek-api',
     apiSelectServer: 'deepseek/',
     targetLanguage: 'ZH-HANS',
+    deepseekModel: 'deepseek-v4-flash',
     streamDeepseek: 'true',
     [i18n.UI_LANGUAGE_KEY]: i18n.detectInitialUiLanguage(),
     [theme.THEME_MODE_KEY]: theme.DEFAULT_THEME_MODE
@@ -26,9 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const quickModeSelect = document.getElementById('quickModeSelect');
   const quickApiSelectServer = document.getElementById('quickApiSelectServer');
   const quickApiSelect = document.getElementById('quickApiSelect');
+  const deepseekModelSelect = document.getElementById('deepseekModelSelect');
   const streamDeepseekSelect = document.getElementById('streamDeepseekSelect');
   const quickServerGroup = document.getElementById('quickServerGroup');
   const quickApiGroup = document.getElementById('quickApiGroup');
+  const deepseekModelGroup = document.getElementById('deepseekModelGroup');
   const streamGroup = document.getElementById('streamGroup');
   const openOptionsBtn = document.getElementById('openOptionsBtn');
   const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -52,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     quickServerGroup.hidden = !isServerMode;
     quickApiGroup.hidden = isServerMode;
+    deepseekModelGroup.hidden = !isDeepseekApi;
     streamGroup.hidden = !isDeepseekApi;
   }
 
@@ -68,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     i18n.populateSelect(quickModeSelect, i18n.getBackendModeOptions(language), items.backendMode);
     i18n.populateSelect(quickApiSelectServer, i18n.getServerTargetOptions(language), items.apiSelectServer);
     i18n.populateSelect(quickApiSelect, i18n.getApiBrandOptions(language), items.apiBrand);
+    i18n.populateSelect(deepseekModelSelect, i18n.getDeepseekModelOptions(language), items.deepseekModel);
     i18n.populateSelect(streamDeepseekSelect, i18n.getStreamModeOptions(language), items.streamDeepseek);
 
     updateVisibility(items);
@@ -102,6 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   quickApiSelect.addEventListener('change', () => {
     chrome.storage.local.set({ apiBrand: quickApiSelect.value }, updateModeUI);
+  });
+
+  deepseekModelSelect.addEventListener('change', () => {
+    chrome.storage.local.set({ deepseekModel: deepseekModelSelect.value }, updateModeUI);
   });
 
   streamDeepseekSelect.addEventListener('change', () => {

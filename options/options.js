@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     apiBrand: 'deepl-api',
     deeplApiKey: '',
     deepseekApiKey: '',
+    deepseekModel: 'deepseek-v4-flash',
     deeplEndpoint: 'free-deepl',
     [i18n.UI_LANGUAGE_KEY]: i18n.detectInitialUiLanguage(),
     [theme.THEME_MODE_KEY]: theme.DEFAULT_THEME_MODE
@@ -29,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const serverSection = document.getElementById('serverSection');
   const apiSection = document.getElementById('apiSection');
   const apiSelect = document.getElementById('apiSelect');
+  const deepseekModelField = document.getElementById('deepseekModelField');
+  const deepseekModelSelect = document.getElementById('deepseekModelSelect');
 
   const serverUrlInput = document.getElementById('server');
   const httpMethodSelect = document.getElementById('HTTPMethods');
@@ -131,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setSectionState(serverSection, mode === 'server');
     setSectionState(apiSection, mode === 'api');
+    setSectionState(deepseekModelField, mode === 'api' && brand === 'deepseek-api');
     setSectionState(deeplSection, mode === 'api' && brand === 'deepl-api');
     setSectionState(deepseekSection, mode === 'api' && brand === 'deepseek-api');
     setSectionState(googleSection, mode === 'api' && brand === 'google-api');
@@ -150,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
     i18n.populateSelect(httpMethodSelect, i18n.getHttpMethodOptions(currentLanguage), items.httpMethod);
     i18n.populateSelect(apiSelectServer, i18n.getServerTargetOptions(currentLanguage), items.apiSelectServer);
     i18n.populateSelect(apiSelect, i18n.getApiBrandOptions(currentLanguage), items.apiBrand);
+    i18n.populateSelect(deepseekModelSelect, i18n.getDeepseekModelOptions(currentLanguage), items.deepseekModel);
     i18n.populateSelect(endpointSelectDeepl, i18n.getDeeplEndpointOptions(currentLanguage), items.deeplEndpoint);
 
     refreshVisibilityToggleLabels();
@@ -186,6 +191,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   apiSelect.addEventListener('change', () => {
     chrome.storage.local.set({ apiBrand: apiSelect.value }, loadSavedSettings);
+  });
+
+  deepseekModelSelect.addEventListener('change', () => {
+    chrome.storage.local.set({ deepseekModel: deepseekModelSelect.value }, loadSavedSettings);
   });
 
   saveBtnServer.addEventListener('click', () => {

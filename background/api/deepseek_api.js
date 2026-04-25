@@ -1,5 +1,5 @@
 // background/api/deepseek_api.js
-export async function translate({ text, target, apiKey, streamDeepseek, meta = {} }) {
+export async function translate({ text, target, apiKey, streamDeepseek, deepseekModel, meta = {} }) {
   if (!text || typeof text !== 'string') {
     return { success: false, error: 'missing_text' };
   }
@@ -10,9 +10,10 @@ export async function translate({ text, target, apiKey, streamDeepseek, meta = {
     { "role": "system", "content": "You are a professional translator proficient in any field. Please translate the text to " + target + ", and only give me the translation. The text is \"" + text + "\"" },
   ];
   const params = {
-    model: "deepseek-chat",
+    model: deepseekModel,
     messages: messages,
-    stream: streamDeepseek
+    stream: streamDeepseek,
+    thinking: { "type": "disabled" },
   };
 
   try {

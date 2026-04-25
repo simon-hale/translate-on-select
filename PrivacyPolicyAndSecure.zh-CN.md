@@ -1,6 +1,6 @@
 # Translate-on-Select 隐私权声明与安全处理说明
 
-更新日期：2026-03-17
+更新日期：2026-04-25
 
 语言版本：[English](./PrivacyPolicyAndSecure.md) | **简体中文** | [繁體中文](./PrivacyPolicyAndSecure.zh-TW.md)
 
@@ -23,6 +23,7 @@
   - DeepL API Key
   - DeepSeek API Key
   - DeepL Endpoint 类型
+  - DeepSeek 模型选择
   - DeepSeek 流式输出开关
   - 界面语言
   - 主题模式
@@ -118,6 +119,7 @@
 - `deepseekApiKey`
 - `deeplEndpoint`
 - `targetLanguage`
+- `deepseekModel`
 - `streamDeepseek`
 - `uiLanguage`
 - `themeMode`

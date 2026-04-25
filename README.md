@@ -104,6 +104,7 @@ This project is a plain JavaScript Chrome Extension built on Manifest V3. It sup
   - save backend URL and backend endpoint type
   - save DeepL API key and endpoint type
   - save DeepSeek API key
+  - choose the Deepseek V4 model
 
 ## Translation Modes 🔀
 
@@ -198,6 +199,9 @@ Required:
 
 Optional:
 
+- choose the Deepseek V4 model:
+  - `Flash` (`deepseek-v4-flash`)
+  - `Pro` (`deepseek-v4-pro`)
 - enable or disable streaming in the popup
 
 #### C. Server relay
@@ -206,7 +210,7 @@ Required:
 
 - server URL
 - endpoint type:
-  - `Deepseek V3 Chat`
+  - `Deepseek V4`
   - `DeepL`
 
 Optional:
@@ -289,6 +293,7 @@ The extension stores settings in `chrome.storage.local`, including:
 - server URL
 - API keys
 - DeepL endpoint selection
+- DeepSeek model selection
 - DeepSeek streaming toggle
 - UI language
 - theme mode

@@ -104,6 +104,7 @@
   - 儲存後端 URL 與後端端點類型
   - 儲存 DeepL API Key 與 endpoint 類型
   - 儲存 DeepSeek API Key
+  - 選擇 Deepseek V4 模型
 
 ## 翻譯模式 🔀
 
@@ -198,6 +199,9 @@ Options 介面概覽：
 
 可選：
 
+- 選擇 Deepseek V4 模型：
+  - `Flash` (`deepseek-v4-flash`)
+  - `Pro` (`deepseek-v4-pro`)
 - 在 popup 中開啟或關閉串流輸出
 
 #### C. 後端中轉
@@ -206,7 +210,7 @@ Options 介面概覽：
 
 - server URL
 - 端點類型：
-  - `Deepseek V3 Chat`
+  - `Deepseek V4`
   - `DeepL`
 
 可選：
@@ -289,6 +293,7 @@ Options 介面概覽：
 - server URL
 - API keys
 - DeepL endpoint 選擇
+- DeepSeek 模型選擇
 - DeepSeek 串流開關
 - 介面語言
 - 主題模式

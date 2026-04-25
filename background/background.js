@@ -18,7 +18,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       // 读取本地数据
       const items = await new Promise((resolve) => {
         chrome.storage.local.get(
-          ['backendMode','apiBrand','serverUrl','httpMethod','apiSelectServer','deeplApiKey','deepseekApiKey','deeplEndpoint','targetLanguage', 'streamDeepseek'],
+          ['backendMode','apiBrand','serverUrl','httpMethod','apiSelectServer','deeplApiKey','deepseekApiKey','deeplEndpoint','targetLanguage', 'streamDeepseek', 'deepseekModel'],
           resolve
         );
       });
@@ -28,6 +28,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const apiBrand = items && items.apiBrand ? items.apiBrand : 'deepl-api'; // default if api mode
       const targetFormat = normalizeTargetForBrand(apiBrand, msg.target || items && items.targetLanguage || 'ZH-HANS');
       const streamDeepseek = items && items.streamDeepseek ? (items.streamDeepseek === 'true') : false;
+      const deepseekModel = items && items.deepseekModel ? items.deepseekModel : 'deepseek-v4-flash';
 
       // helper: is async iterable?
       function isAsyncIterable(obj) {
@@ -138,6 +139,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             target: targetFormat,
             apiKey: deepseekApiKey,
             streamDeepseek,
+            deepseekModel,
             meta: { from: 'deepseek' },
           });
 

@@ -1,6 +1,6 @@
 # Translate-on-Select Privacy Policy and Secure Handling Disclosure
 
-Updated: 2026-03-17
+Updated: 2026-04-25
 
 Languages: **English** | [简体中文](./PrivacyPolicyAndSecure.zh-CN.md) | [繁體中文](./PrivacyPolicyAndSecure.zh-TW.md)
 
@@ -23,6 +23,7 @@ This extension currently processes the following data:
   - DeepL API Key
   - DeepSeek API Key
   - DeepL endpoint type
+  - DeepSeek model selection
   - DeepSeek streaming toggle
   - Interface language
   - Theme mode
@@ -118,6 +119,7 @@ This extension stores the following configuration items in the current browser�
 - `deepseekApiKey`
 - `deeplEndpoint`
 - `targetLanguage`
+- `deepseekModel`
 - `streamDeepseek`
 - `uiLanguage`
 - `themeMode`

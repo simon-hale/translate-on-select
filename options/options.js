@@ -178,23 +178,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   uiLanguageSelect.addEventListener('change', () => {
-    chrome.storage.local.set({ [i18n.UI_LANGUAGE_KEY]: uiLanguageSelect.value }, loadSavedSettings);
+    chrome.storage.local.set({ [i18n.UI_LANGUAGE_KEY]: uiLanguageSelect.value });
   });
 
   backendModelSelect.addEventListener('change', () => {
-    chrome.storage.local.set({ backendMode: backendModelSelect.value }, loadSavedSettings);
+    chrome.storage.local.set({ backendMode: backendModelSelect.value });
   });
 
   apiSelectServer.addEventListener('change', () => {
-    chrome.storage.local.set({ apiSelectServer: apiSelectServer.value }, loadSavedSettings);
+    chrome.storage.local.set({ apiSelectServer: apiSelectServer.value });
   });
 
   apiSelect.addEventListener('change', () => {
-    chrome.storage.local.set({ apiBrand: apiSelect.value }, loadSavedSettings);
+    chrome.storage.local.set({ apiBrand: apiSelect.value });
   });
 
   deepseekModelSelect.addEventListener('change', () => {
-    chrome.storage.local.set({ deepseekModel: deepseekModelSelect.value }, loadSavedSettings);
+    chrome.storage.local.set({ deepseekModel: deepseekModelSelect.value });
   });
 
   saveBtnServer.addEventListener('click', () => {
@@ -221,7 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
       () => {
         alert(i18n.t(currentLanguage, 'options.alerts.serverSaved'));
         serverUrlInput.value = url;
-        loadSavedSettings();
       }
     );
   });
@@ -232,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
       httpMethodSelect.value = defaults.httpMethod;
       apiSelectServer.value = defaults.apiSelectServer;
       alert(i18n.t(currentLanguage, 'options.alerts.serverCleared'));
-      loadSavedSettings();
     });
   });
 
@@ -253,7 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       () => {
         alert(i18n.t(currentLanguage, 'options.alerts.deeplSaved'));
-        loadSavedSettings();
       }
     );
   });
@@ -264,7 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
       endpointSelectDeepl.value = defaults.deeplEndpoint;
       resetInputVisibility('apiKey-deepl');
       alert(i18n.t(currentLanguage, 'options.alerts.deeplCleared'));
-      loadSavedSettings();
     });
   });
 
@@ -283,7 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       () => {
         alert(i18n.t(currentLanguage, 'options.alerts.deepseekSaved'));
-        loadSavedSettings();
       }
     );
   });
@@ -293,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
       apiKeyInputDeepseek.value = '';
       resetInputVisibility('apiKey-deepseek');
       alert(i18n.t(currentLanguage, 'options.alerts.deepseekCleared'));
-      loadSavedSettings();
     });
   });
 

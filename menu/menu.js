@@ -90,31 +90,31 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   targetInput.addEventListener('change', () => {
-    chrome.storage.local.set({ targetLanguage: targetInput.value.trim() }, updateModeUI);
+    chrome.storage.local.set({ targetLanguage: targetInput.value.trim() });
   });
 
   uiLanguageSelect.addEventListener('change', () => {
-    chrome.storage.local.set({ [i18n.UI_LANGUAGE_KEY]: uiLanguageSelect.value }, updateModeUI);
+    chrome.storage.local.set({ [i18n.UI_LANGUAGE_KEY]: uiLanguageSelect.value });
   });
 
   quickModeSelect.addEventListener('change', () => {
-    chrome.storage.local.set({ backendMode: quickModeSelect.value }, updateModeUI);
+    chrome.storage.local.set({ backendMode: quickModeSelect.value });
   });
 
   quickApiSelectServer.addEventListener('change', () => {
-    chrome.storage.local.set({ apiSelectServer: quickApiSelectServer.value }, updateModeUI);
+    chrome.storage.local.set({ apiSelectServer: quickApiSelectServer.value });
   });
 
   quickApiSelect.addEventListener('change', () => {
-    chrome.storage.local.set({ apiBrand: quickApiSelect.value }, updateModeUI);
+    chrome.storage.local.set({ apiBrand: quickApiSelect.value });
   });
 
   deepseekModelSelect.addEventListener('change', () => {
-    chrome.storage.local.set({ deepseekModel: deepseekModelSelect.value }, updateModeUI);
+    chrome.storage.local.set({ deepseekModel: deepseekModelSelect.value });
   });
 
   streamDeepseekSelect.addEventListener('change', () => {
-    chrome.storage.local.set({ streamDeepseek: streamDeepseekSelect.value }, updateModeUI);
+    chrome.storage.local.set({ streamDeepseek: streamDeepseekSelect.value });
   });
 
   openOptionsBtn.addEventListener('click', () => {
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', () => {
       const nextThemeMode = theme.toggleThemeMode(currentThemeMode);
-      chrome.storage.local.set({ [theme.THEME_MODE_KEY]: nextThemeMode }, updateModeUI);
+      chrome.storage.local.set({ [theme.THEME_MODE_KEY]: nextThemeMode });
     });
   }
 

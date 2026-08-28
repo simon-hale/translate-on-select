@@ -35,7 +35,8 @@
         },
         'deepseekModels': {
           'deepseek-v4-flash': 'Flash',
-          'deepseek-v4-pro': 'Pro'
+          'deepseek-v4-pro': 'Pro',
+          'deepseek-v4-flash-vision-exp': 'Flash-Vision'
         },
         'streamModes': {
           'true': 'Streaming',
@@ -61,7 +62,9 @@
         'deepseekModelLabel': 'Deepseek V4 Model',
         'streamModeLabel': 'Deepseek Output Mode',
         'storageNote': 'Settings are stored locally only.',
-        'moreSettingsButton': 'More Settings'
+        'moreSettingsButton': 'More Settings',
+        'visionButton': 'Capture',
+        'visionUnavailable': 'Cannot reach the current page. Please reload the tab and try again.'
       },
       'options': {
         'pageTitle': 'Translate on Select - Settings',
@@ -69,49 +72,24 @@
         'heroText': 'Manage the mode, server URL, and API keys.',
         'currentModeLabel': 'Current Mode',
         'currentSourceLabel': 'Current Source',
-        'iconAlt': 'Translate on Select icon',
-        'localStorageLabel': 'Local Storage',
-        'localStorageText': 'Settings are stored only in this browser.',
-        'recommendationTitle': 'Recommendation',
-        'recommendationText': 'If you have a relay service, prefer server mode.',
-        'securityTitle': 'Security',
-        'securityText': 'Do not share screenshots or settings that contain API keys.',
         'currentModeTitle': 'Current Mode',
-        'generalKicker': 'General',
         'generalTitle': 'General Settings',
-        'generalCopy': 'Pick the interface language and working mode first.',
         'modeLabel': 'Working Mode',
-        'modeHint': 'Server mode uses your backend, while API mode talks to providers directly.',
-        'uiLanguageHint': 'Applies to the popup, options page, and on-page translation overlay.',
-        'serverKicker': 'Server',
         'serverTitle': 'Server',
-        'serverCopy': 'Provide the URL, request method, and service type.',
         'serverUrlLabel': 'Server URL',
         'requestMethodLabel': 'Request Method',
         'serverEndpointLabel': 'Service Endpoint Type',
-        'serverEndpointHint': 'Select the service type used by the current server.',
         'saveSettingsButton': 'Save Settings',
         'clearButton': 'Clear',
-        'noteTitle': 'Note',
-        'noteText': 'A trailing `/` will be appended automatically when saving.',
-        'apiKicker': 'API',
         'apiTitle': 'API Brand',
-        'apiCopy': 'The matching configuration card appears after switching.',
         'apiBrandLabel': 'Current Brand',
         'deepseekModelLabel': 'Deepseek V4 Model',
-        'deeplKicker': 'DeepL',
         'deeplTitle': 'DeepL',
-        'deeplCopy': 'Save the DeepL key and endpoint.',
         'apiKeyLabel': 'API Key',
         'endpointLabel': 'Endpoint',
         'clearKeyButton': 'Clear Key',
-        'deepseekKicker': 'Deepseek',
         'deepseekTitle': 'Deepseek',
-        'deepseekCopy': 'Save the Deepseek key.',
-        'googleKicker': 'Google',
         'googleTitle': 'Google',
-        'googleCopy': 'The entry point is reserved but not wired yet.',
-        'notImplementedTitle': 'Not implemented yet',
         'notImplementedText': 'You can add configuration fields here later.',
         'modeSummaries': {
           'server': 'Currently using server mode.',
@@ -142,7 +120,12 @@
         'loading': 'Translating...',
         'translationFailed': 'Translation failed: {error}',
         'noSelection': 'No text selected.',
-        'textTooLong': 'The selected text is too long (> {max} characters). Please shorten the selection.'
+        'textTooLong': 'The selected text is too long (> {max} characters). Please shorten the selection.',
+        'visionCaptureFailed': 'Screenshot failed: {error}',
+        'visionLoading': 'Translating screenshot…',
+        'visionDrawHint': 'Press and hold the left button and drag to select the region',
+        'visionConfirm': 'Confirm',
+        'visionCancel': 'Cancel'
       }
     },
     'zh-CN': {
@@ -177,7 +160,8 @@
         },
         'deepseekModels': {
           'deepseek-v4-flash': 'Flash',
-          'deepseek-v4-pro': 'Pro'
+          'deepseek-v4-pro': 'Pro',
+          'deepseek-v4-flash-vision-exp': 'Flash-Vision'
         },
         'streamModes': {
           'true': '流式输出',
@@ -203,7 +187,9 @@
         'deepseekModelLabel': 'Deepseek V4 模型',
         'streamModeLabel': 'Deepseek 输出模式',
         'storageNote': '配置仅保存在本地。',
-        'moreSettingsButton': '更多设置'
+        'moreSettingsButton': '更多设置',
+        'visionButton': '截图',
+        'visionUnavailable': '无法连接当前页面，请刷新标签页后重试。'
       },
       'options': {
         'pageTitle': 'Translate on Select - 设置',
@@ -211,49 +197,24 @@
         'heroText': '管理模式、服务器地址和 API Key。',
         'currentModeLabel': '当前模式',
         'currentSourceLabel': '当前来源',
-        'iconAlt': 'Translate on Select 图标',
-        'localStorageLabel': '本地存储',
-        'localStorageText': '配置只保存在当前浏览器。',
-        'recommendationTitle': '建议',
-        'recommendationText': '有自建中转服务时，优先使用服务器模式。',
-        'securityTitle': '安全',
-        'securityText': '不要公开带有 API Key 的截图或配置。',
         'currentModeTitle': '当前模式',
-        'generalKicker': '基础',
         'generalTitle': '基础设置',
-        'generalCopy': '先选择界面语言，再配置翻译模式。',
         'modeLabel': '工作模式',
-        'modeHint': '服务器模式走后端，API 模式直连第三方。',
-        'uiLanguageHint': '会同时应用到弹窗、设置页和网页内翻译浮层。',
-        'serverKicker': '服务器',
         'serverTitle': '服务器',
-        'serverCopy': '填写地址、请求方式和服务类型。',
         'serverUrlLabel': '服务器 URL',
         'requestMethodLabel': '请求方法',
         'serverEndpointLabel': '服务端点类型',
-        'serverEndpointHint': '选择当前服务端所使用的类型。',
         'saveSettingsButton': '保存配置',
         'clearButton': '清空',
-        'noteTitle': '提示',
-        'noteText': '保存时会自动补全末尾的 `/`。',
-        'apiKicker': 'API',
         'apiTitle': 'API 品牌',
-        'apiCopy': '切换后显示对应配置。',
         'apiBrandLabel': '当前品牌',
         'deepseekModelLabel': 'Deepseek V4 模型',
-        'deeplKicker': 'DeepL',
         'deeplTitle': 'DeepL',
-        'deeplCopy': '保存 DeepL Key 与 endpoint。',
         'apiKeyLabel': 'API Key',
         'endpointLabel': 'Endpoint',
         'clearKeyButton': '清空 Key',
-        'deepseekKicker': 'Deepseek',
         'deepseekTitle': 'Deepseek',
-        'deepseekCopy': '保存 Deepseek Key。',
-        'googleKicker': 'Google',
         'googleTitle': 'Google',
-        'googleCopy': '入口已预留，暂未接入。',
-        'notImplementedTitle': '尚未适配',
         'notImplementedText': '后续可在这里补充配置项。',
         'modeSummaries': {
           'server': '当前为服务器模式。',
@@ -284,7 +245,12 @@
         'loading': '翻译中…',
         'translationFailed': '翻译失败：{error}',
         'noSelection': '没有选中文本。',
-        'textTooLong': '文本过长（> {max} 字符），请缩短选区。'
+        'textTooLong': '文本过长（> {max} 字符），请缩短选区。',
+        'visionCaptureFailed': '截图失败：{error}',
+        'visionLoading': '正在翻译截图…',
+        'visionDrawHint': '长按左键拖动，选取截图区域',
+        'visionConfirm': '确认',
+        'visionCancel': '取消'
       }
     },
     'zh-TW': {
@@ -319,7 +285,8 @@
         },
         'deepseekModels': {
           'deepseek-v4-flash': 'Flash',
-          'deepseek-v4-pro': 'Pro'
+          'deepseek-v4-pro': 'Pro',
+          'deepseek-v4-flash-vision-exp': 'Flash-Vision'
         },
         'streamModes': {
           'true': '串流輸出',
@@ -345,7 +312,9 @@
         'deepseekModelLabel': 'Deepseek V4 模型',
         'streamModeLabel': 'Deepseek 輸出模式',
         'storageNote': '設定只會儲存在本機。',
-        'moreSettingsButton': '更多設定'
+        'moreSettingsButton': '更多設定',
+        'visionButton': '截圖',
+        'visionUnavailable': '無法連線目前頁面，請重新整理分頁後再試。'
       },
       'options': {
         'pageTitle': 'Translate on Select - 設定',
@@ -353,49 +322,24 @@
         'heroText': '管理模式、伺服器位址與 API Key。',
         'currentModeLabel': '目前模式',
         'currentSourceLabel': '目前來源',
-        'iconAlt': 'Translate on Select 圖示',
-        'localStorageLabel': '本機儲存',
-        'localStorageText': '設定只會儲存在目前瀏覽器。',
-        'recommendationTitle': '建議',
-        'recommendationText': '如果有自建中轉服務，優先使用伺服器模式。',
-        'securityTitle': '安全',
-        'securityText': '不要公開包含 API Key 的截圖或設定。',
         'currentModeTitle': '目前模式',
-        'generalKicker': '基本',
         'generalTitle': '基本設定',
-        'generalCopy': '先選擇介面語言，再設定翻譯模式。',
         'modeLabel': '工作模式',
-        'modeHint': '伺服器模式經由後端，API 模式直接連線第三方。',
-        'uiLanguageHint': '會同步套用到彈窗、設定頁與網頁內翻譯浮層。',
-        'serverKicker': '伺服器',
         'serverTitle': '伺服器',
-        'serverCopy': '填寫位址、請求方式與服務類型。',
         'serverUrlLabel': '伺服器 URL',
         'requestMethodLabel': '請求方法',
         'serverEndpointLabel': '服務端點類型',
-        'serverEndpointHint': '選擇目前伺服器使用的服務類型。',
         'saveSettingsButton': '儲存設定',
         'clearButton': '清空',
-        'noteTitle': '提示',
-        'noteText': '儲存時會自動補上結尾的 `/`。',
-        'apiKicker': 'API',
         'apiTitle': 'API 品牌',
-        'apiCopy': '切換後會顯示對應設定。',
         'apiBrandLabel': '目前品牌',
         'deepseekModelLabel': 'Deepseek V4 模型',
-        'deeplKicker': 'DeepL',
         'deeplTitle': 'DeepL',
-        'deeplCopy': '儲存 DeepL Key 與 endpoint。',
         'apiKeyLabel': 'API Key',
         'endpointLabel': 'Endpoint',
         'clearKeyButton': '清空 Key',
-        'deepseekKicker': 'Deepseek',
         'deepseekTitle': 'Deepseek',
-        'deepseekCopy': '儲存 Deepseek Key。',
-        'googleKicker': 'Google',
         'googleTitle': 'Google',
-        'googleCopy': '入口已預留，尚未接入。',
-        'notImplementedTitle': '尚未支援',
         'notImplementedText': '之後可以在這裡補上設定項目。',
         'modeSummaries': {
           'server': '目前為伺服器模式。',
@@ -426,7 +370,12 @@
         'loading': '翻譯中…',
         'translationFailed': '翻譯失敗：{error}',
         'noSelection': '沒有選取文字。',
-        'textTooLong': '文字過長（> {max} 字元），請縮短選取範圍。'
+        'textTooLong': '文字過長（> {max} 字元），請縮短選取範圍。',
+        'visionCaptureFailed': '截圖失敗：{error}',
+        'visionLoading': '正在翻譯截圖…',
+        'visionDrawHint': '長按左鍵拖曳，選取截圖範圍',
+        'visionConfirm': '確認',
+        'visionCancel': '取消'
       }
     }
   };
@@ -436,7 +385,7 @@
   const backendModeValues = ['server', 'api'];
   const serverTargetValues = ['deepseek/', 'deepl/'];
   const apiBrandValues = ['deepl-api', 'deepseek-api', 'google-api'];
-  const deepseekModelValues = ['deepseek-v4-flash', 'deepseek-v4-pro'];
+  const deepseekModelValues = ['deepseek-v4-flash', 'deepseek-v4-pro', 'deepseek-v4-flash-vision-exp'];
   const streamModeValues = ['true', 'false'];
   const httpMethodValues = ['POST', 'GET'];
   const deeplEndpointValues = ['free-deepl', 'pro-deepl'];

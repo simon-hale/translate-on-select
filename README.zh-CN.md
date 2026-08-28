@@ -58,8 +58,10 @@
 - 🌗 popup 内置浅色 / 深色切换，并在 popup、options 页面和页内翻译弹层之间共享主题
 - 🌍 支持三语言界面切换：English、简体中文、繁体中文
 - 🔤 支持 DeepL 直连 API
-- 🤖 支持 DeepSeek 直连 API
-- 📡 DeepSeek 直连模式支持可选流式输出
+- 🤖 DeepSeek 直连 API 支持三种 V4 模型：Flash、Pro 和 Flash-Vision
+- 📡 DeepSeek V4 模型支持可选流式输出
+- 🖼️ 截图翻译：在当前标签页上框选可调整的区域，使用 Flash-Vision 模型翻译
+- 🎛️ popup 与 options 页面使用主题化的自定义下拉菜单替代原生 `<select>` 控件
 - 🖥️ 支持自建后端中转翻译请求
 
 ## 支持的目标语言 🌍
@@ -95,16 +97,17 @@
 
 - `menu/` 是快速设置 popup：
   - 选择目标语言
-  - 选择界面语言
   - 切换 `server` 和 `api` 模式
   - 快速切换当前翻译来源
+  - 选择 DeepSeek V4 模型（Flash / Pro / Flash-Vision）
   - 切换浅色 / 深色主题
+  - Flash-Vision 模式下，标题右侧会出现截图翻译入口
 - `options/` 是完整设置页：
   - 保存界面语言
   - 保存后端 URL 和后端端点类型
   - 保存 DeepL API Key 和 endpoint 类型
   - 保存 DeepSeek API Key
-  - 选择 Deepseek V4 模型
+  - 选择 DeepSeek V4 模型和流式输出模式
 
 ## 翻译模式 🔀
 
@@ -165,9 +168,9 @@
 你可以在 popup 中完成以下高频操作：
 
 - 选择目标语言
-- 选择界面语言
 - 选择 `自定义服务器` 或 `自定义 API`
 - 快速切换当前 provider
+- 选择 DeepSeek V4 模型
 - 切换浅色 / 深色主题
 
 Popup 界面概览：
@@ -202,7 +205,8 @@ Options 界面概览：
 - 选择 Deepseek V4 模型：
   - `Flash` (`deepseek-v4-flash`)
   - `Pro` (`deepseek-v4-pro`)
-- 在 popup 中开启或关闭流式输出
+  - `Flash-Vision` (`deepseek-v4-flash-vision-exp`) —— 启用截图翻译入口
+- 在 options 页面开启或关闭流式输出
 
 #### C. 后端中转
 
@@ -225,6 +229,7 @@ Options 界面概览：
 - 当前实现中，选中文本长度超过 `2400` 字符会被拒绝。
 - 结果弹层支持手动复制。
 - 当前实现中，结果弹层不会自动定时关闭。
+- 截图翻译（Flash-Vision）：在 popup 中点击 `截图`，拖动框选区域，通过手柄调整后确认。截图区域仅保留在内存中，确认后才发送给 DeepSeek，使用后立即丢弃。Flash-Vision 模式下，划词翻译仍然可用，文字请求使用原文字翻译提示词调用同一 Flash-Vision 模型，截图请求使用专门的视觉提示词。
 - 界面支持 English、简体中文 和 繁体中文 三种语言。
 - 保存后的主题模式会复用到 popup、options 页面和页内翻译浮层。
 
@@ -237,6 +242,8 @@ Options 界面概览：
 │  └─ api/
 │     ├─ deepl_api.js            # DeepL 直连适配器
 │     ├─ deepseek_api.js         # DeepSeek 直连适配器
+│     ├─ deepseek_vision_api.js  # DeepSeek flash-vision 适配器（截图翻译）
+│     ├─ sse_reader.js           # 共享 SSE 流式解析器
 │     └─ server_api.js           # 后端中转适配器
 ├─ front/
 │  └─ contentScript.js           # 划词检测与页面内翻译弹层
@@ -248,6 +255,7 @@ Options 界面概览：
 │  └─ options.js                 # 设置存储与界面切换逻辑
 ├─ shared/
 │  ├─ i18n.js                    # 多语言资源与本地化辅助
+│  ├─ select.js                  # 主题化自定义下拉组件
 │  └─ theme.js                   # 浅色 / 深色主题辅助
 ├─ icons/
 ├─ PrivacyPolicyAndSecure.md     # 隐私政策（英文）

@@ -1,16 +1,81 @@
 import { translate as translateDeepl } from './api/deepl_api.js';
 import { translate as translateDeepseek } from './api/deepseek_api.js';
 import { translate as translateServer } from './api/server_api.js';
+import { translateVision } from './api/deepseek_vision_api.js';
 
 console.log('BG: Quick Select Translate (dispatcher) loaded');
+
+// helper: is async iterable?
+function isAsyncIterable(obj) {
+  return obj && typeof obj[Symbol.asyncIterator] === 'function';
+}
+
+// helper to forward streaming chunks to content tab
+async function streamToTab(iterable, tabId) {
+  let full = '';
+  try {
+    for await (const chunk of iterable) {
+      let textChunk;
+      if (typeof chunk === 'string') textChunk = chunk;
+      else if (chunk && typeof chunk.text === 'string') textChunk = chunk.text;
+      else textChunk = String(chunk);
+      full += textChunk;
+      if (tabId) {
+        try {
+          chrome.tabs.sendMessage(tabId, { action: 'translate_stream', chunk: textChunk, done: false });
+        } catch (e) {
+          // ignore sendMessage errors
+        }
+      }
+    }
+    if (tabId) {
+      chrome.tabs.sendMessage(tabId, { action: 'translate_stream', done: true, success: true, translated: full });
+    }
+    return { success: true, translated: full };
+  } catch (err) {
+    if (tabId) {
+      chrome.tabs.sendMessage(tabId, { action: 'translate_stream', done: true, success: false, error: err && err.message ? err.message : String(err) });
+    }
+    return { success: false, error: err && err.message ? err.message : String(err) };
+  }
+}
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   // Keep listener non-blocking but we'll use async flow and return true for async response.
   (async () => {
     try {
-      console.log('BG received:', msg);
+      if (!msg) {
+        sendResponse({ success: false, error: 'unsupported_action' });
+        return;
+      }
 
-      if (!msg || msg.action !== 'translate') {
+      if (msg.action === 'translate_vision') {
+        console.log('BG received: translate_vision (image payload omitted)');
+      } else {
+        console.log('BG received:', msg);
+      }
+
+      // 截图：使用 Chrome 内置接口截取当前标签页可见区域（供视觉翻译使用）
+      if (msg.action === 'capture_visible_tab') {
+        if (!sender || !sender.tab) {
+          sendResponse({ success: false, error: 'no_tab_context' });
+          return;
+        }
+        if (!sender.tab.active) {
+          sendResponse({ success: false, error: 'tab_not_active' });
+          return;
+        }
+        try {
+          const options = { format: 'jpeg', quality: 85 };
+          const dataUrl = await chrome.tabs.captureVisibleTab(sender.tab.windowId, options);
+          sendResponse({ success: true, dataUrl });
+        } catch (err) {
+          sendResponse({ success: false, error: err && err.message ? err.message : String(err) });
+        }
+        return;
+      }
+
+      if (msg.action !== 'translate' && msg.action !== 'translate_vision') {
         sendResponse({ success: false, error: 'unsupported_action' });
         return;
       }
@@ -30,39 +95,44 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const streamDeepseek = items && items.streamDeepseek ? (items.streamDeepseek === 'true') : false;
       const deepseekModel = items && items.deepseekModel ? items.deepseekModel : 'deepseek-v4-flash';
 
-      // helper: is async iterable?
-      function isAsyncIterable(obj) {
-        return obj && typeof obj[Symbol.asyncIterator] === 'function';
-      }
-
-      // helper to forward streaming chunks to content tab
-      async function streamToTab(iterable, tabId) {
-        let full = '';
-        try {
-          for await (const chunk of iterable) {
-            let textChunk;
-            if (typeof chunk === 'string') textChunk = chunk;
-            else if (chunk && typeof chunk.text === 'string') textChunk = chunk.text;
-            else textChunk = String(chunk);
-            full += textChunk;
-            if (tabId) {
-              try {
-                chrome.tabs.sendMessage(tabId, { action: 'translate_stream', chunk: textChunk, done: false });
-              } catch (e) {
-                // ignore sendMessage errors
-              }
-            }
-          }
-          if (tabId) {
-            chrome.tabs.sendMessage(tabId, { action: 'translate_stream', done: true, success: true, translated: full });
-          }
-          return { success: true, translated: full };
-        } catch (err) {
-          if (tabId) {
-            chrome.tabs.sendMessage(tabId, { action: 'translate_stream', done: true, success: false, error: err && err.message ? err.message : String(err) });
-          }
-          return { success: false, error: err && err.message ? err.message : String(err) };
+      // 视觉翻译：仅针对 api 模式下的 deepseek 接口新增
+      if (msg.action === 'translate_vision') {
+        if (backendMode !== 'api' || apiBrand !== 'deepseek-api') {
+          sendResponse({ success: false, error: 'vision_requires_deepseek_api' });
+          return;
         }
+        if (deepseekModel !== 'deepseek-v4-flash-vision-exp') {
+          sendResponse({ success: false, error: 'vision_requires_flash_vision_model' });
+          return;
+        }
+
+        const deepseekApiKey = items && items.deepseekApiKey ? items.deepseekApiKey : null;
+        if (!deepseekApiKey) {
+          sendResponse({ success: false, error: 'missing_api_key' });
+          return;
+        }
+
+        if (!msg.imageDataUrl || typeof msg.imageDataUrl !== 'string') {
+          sendResponse({ success: false, error: 'missing_image' });
+          return;
+        }
+
+        const visionTarget = normalizeTargetForBrand('deepseek-api', items && items.targetLanguage || 'ZH-HANS');
+        const resultOrIterable = await translateVision({
+          imageDataUrl: msg.imageDataUrl,
+          target: visionTarget,
+          apiKey: deepseekApiKey,
+          streamDeepseek
+        });
+
+        if (isAsyncIterable(resultOrIterable)) {
+          const tabId = sender && sender.tab && sender.tab.id ? sender.tab.id : null;
+          const streamResult = await streamToTab(resultOrIterable, tabId);
+          sendResponse(streamResult);
+        } else {
+          sendResponse(resultOrIterable);
+        }
+        return;
       }
 
       // 判断后端服务器模式
@@ -82,8 +152,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           target: targetFormat,
           serverUrl,
           httpMethod,
-          brand: apiServer,
-          meta: { from: 'server' } // pass through if needed
+          brand: apiServer
         });
 
         if (isAsyncIterable(resultOrIterable)) {
@@ -139,8 +208,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             target: targetFormat,
             apiKey: deepseekApiKey,
             streamDeepseek,
-            deepseekModel,
-            meta: { from: 'deepseek' },
+            deepseekModel
           });
 
           if (isAsyncIterable(resultOrIterable)) {

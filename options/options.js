@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     deeplApiKey: '',
     deepseekApiKey: '',
     deepseekModel: 'deepseek-v4-flash',
+    streamDeepseek: 'true',
     deeplEndpoint: 'free-deepl',
     [i18n.UI_LANGUAGE_KEY]: i18n.detectInitialUiLanguage(),
     [theme.THEME_MODE_KEY]: theme.DEFAULT_THEME_MODE
@@ -32,6 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const apiSelect = document.getElementById('apiSelect');
   const deepseekModelField = document.getElementById('deepseekModelField');
   const deepseekModelSelect = document.getElementById('deepseekModelSelect');
+  const deepseekStreamField = document.getElementById('deepseekStreamField');
+  const streamDeepseekSelect = document.getElementById('streamDeepseekSelect');
 
   const serverUrlInput = document.getElementById('server');
   const httpMethodSelect = document.getElementById('HTTPMethods');
@@ -135,6 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setSectionState(serverSection, mode === 'server');
     setSectionState(apiSection, mode === 'api');
     setSectionState(deepseekModelField, mode === 'api' && brand === 'deepseek-api');
+    setSectionState(deepseekStreamField, mode === 'api' && brand === 'deepseek-api');
     setSectionState(deeplSection, mode === 'api' && brand === 'deepl-api');
     setSectionState(deepseekSection, mode === 'api' && brand === 'deepseek-api');
     setSectionState(googleSection, mode === 'api' && brand === 'google-api');
@@ -155,7 +159,13 @@ document.addEventListener('DOMContentLoaded', () => {
     i18n.populateSelect(apiSelectServer, i18n.getServerTargetOptions(currentLanguage), items.apiSelectServer);
     i18n.populateSelect(apiSelect, i18n.getApiBrandOptions(currentLanguage), items.apiBrand);
     i18n.populateSelect(deepseekModelSelect, i18n.getDeepseekModelOptions(currentLanguage), items.deepseekModel);
+    i18n.populateSelect(streamDeepseekSelect, i18n.getStreamModeOptions(currentLanguage), items.streamDeepseek);
     i18n.populateSelect(endpointSelectDeepl, i18n.getDeeplEndpointOptions(currentLanguage), items.deeplEndpoint);
+
+    // 自绘下拉：选项重新填充后同步显示
+    if (globalThis.TranslateOnSelectSelect) {
+      globalThis.TranslateOnSelectSelect.enhanceAll(document);
+    }
 
     refreshVisibilityToggleLabels();
   }
@@ -195,6 +205,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   deepseekModelSelect.addEventListener('change', () => {
     chrome.storage.local.set({ deepseekModel: deepseekModelSelect.value });
+  });
+
+  streamDeepseekSelect.addEventListener('change', () => {
+    chrome.storage.local.set({ streamDeepseek: streamDeepseekSelect.value });
   });
 
   saveBtnServer.addEventListener('click', () => {

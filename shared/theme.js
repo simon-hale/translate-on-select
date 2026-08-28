@@ -1,16 +1,15 @@
-﻿(function (global) {
+(function (global) {
   const THEME_MODE_KEY = 'themeMode';
   const DEFAULT_THEME_MODE = 'light';
 
   const contentPalettes = {
     'light': {
-      'floatButtonBackground': 'linear-gradient(135deg, #c65b2e, #8e3c18)',
-      'floatButtonText': '#fff8f3',
+      'floatButtonBackground': 'linear-gradient(135deg, #5f8f7a, #4a725f)',
+      'floatButtonText': '#f4f9f6',
       'floatButtonBorder': '1px solid rgba(255, 255, 255, 0.34)',
       'floatButtonShadow': '0 12px 28px rgba(24, 38, 44, 0.18)',
-      'popupBackground': 'rgba(255, 252, 247, 0.96)',
+      'popupBackground': 'rgba(246, 250, 246, 0.96)',
       'popupText': '#18262c',
-      'popupMutedText': '#5f6c72',
       'popupErrorText': '#b8402a',
       'popupBorder': '1px solid rgba(24, 38, 44, 0.12)',
       'popupShadow': '0 18px 40px rgba(24, 38, 44, 0.16)',
@@ -20,13 +19,12 @@
       'popupActionShadow': '0 8px 18px rgba(24, 38, 44, 0.08)'
     },
     'dark': {
-      'floatButtonBackground': 'linear-gradient(135deg, #f09a53, #c65b2e)',
-      'floatButtonText': '#1f1712',
+      'floatButtonBackground': 'linear-gradient(135deg, #8fbfa9, #5f8f7a)',
+      'floatButtonText': '#15211b',
       'floatButtonBorder': '1px solid rgba(240, 154, 83, 0.28)',
       'floatButtonShadow': '0 16px 34px rgba(0, 0, 0, 0.34)',
       'popupBackground': 'rgba(16, 22, 28, 0.96)',
       'popupText': '#f4efe7',
-      'popupMutedText': '#aeb7be',
       'popupErrorText': '#ff9b8f',
       'popupBorder': '1px solid rgba(255, 255, 255, 0.1)',
       'popupShadow': '0 22px 48px rgba(0, 0, 0, 0.38)',

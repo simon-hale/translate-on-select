@@ -1,25 +1,45 @@
-// background/api/deepseek_api.js
+// background/api/deepseek_vision_api.js
+// Independent vision interface for the Deepseek V4 flash vision model.
+// Contract reference: DeepseekV4-flash-vision.md in the workspace root.
 import { createSseTextIterable } from './sse_reader.js';
 
-export async function translate({ text, target, apiKey, streamDeepseek, deepseekModel }) {
-  if (!text || typeof text !== 'string') {
-    return { success: false, error: 'missing_text' };
+const VISION_MODEL = 'deepseek-v4-flash-vision-exp';
+const VISION_ENDPOINT = 'https://api.deepseek.com/chat/completions';
+
+// 独立的视觉提示词分支（短，风格与纯文字版提示词保持一致）。
+function buildVisionPrompt(target) {
+  return (
+    'You are a professional translator. Translate all the text visible in the image into ' +
+    target +
+    ', and only give me the translation.'
+  );
+}
+
+export async function translateVision({ imageDataUrl, target, apiKey, streamDeepseek = false }) {
+  if (!imageDataUrl || typeof imageDataUrl !== 'string') {
+    return { success: false, error: 'missing_image' };
   }
   if (!apiKey) return { success: false, error: 'missing_api_key' };
 
-  // 构建请求体，建议请求流式（若服务支持）
+  // 图片以 base64 data URL 内联传入（OpenAI 兼容的 content 块数组）
   const messages = [
-    { "role": "system", "content": "You are a professional translator proficient in any field. Please translate the text to " + target + ", and only give me the translation. The text is \"" + text + "\"" },
+    {
+      role: 'user',
+      content: [
+        { type: 'text', text: buildVisionPrompt(target) },
+        { type: 'image_url', image_url: { url: imageDataUrl } }
+      ]
+    }
   ];
   const params = {
-    model: deepseekModel,
-    messages: messages,
+    model: VISION_MODEL,
+    messages,
     stream: streamDeepseek,
-    thinking: { "type": "disabled" },
+    thinking: { type: 'disabled' },
   };
 
   try {
-    const resp = await fetch('https://api.deepseek.com/chat/completions', {
+    const resp = await fetch(VISION_ENDPOINT, {
       method: 'POST',
       headers: {
         "Authorization": `Bearer ${apiKey}`,
@@ -43,19 +63,16 @@ export async function translate({ text, target, apiKey, streamDeepseek, deepseek
 
     // 如果不是 event-stream（普通 JSON 响应），保持原有行为
     const data = await resp.json().catch(async (err) => {
-      // 如果解析 JSON 失败（极少数情况），尝试把 body 当文本读出以便调试
       const txt = await resp.text().catch(() => '');
-      throw new Error('invalid_json_response: ' + String(txt || err && err.message));
+      throw new Error('invalid_json_response: ' + String(txt || (err && err.message)));
     });
-
-    console.log('deepseek_api response json:', data);
 
     if (!data || !data.choices || data.choices.length === 0) {
       return { success: false, error: data };
     }
 
     const aiMsg = data.choices[0].message && data.choices[0].message.content
-      ? data.choices[0].message.content.trim()
+      ? String(data.choices[0].message.content).trim()
       : null;
 
     if (!aiMsg) {
@@ -64,7 +81,7 @@ export async function translate({ text, target, apiKey, streamDeepseek, deepseek
 
     return { success: true, translated: aiMsg };
   } catch (err) {
-    console.error('deepseek_api.translate error:', err);
+    console.error('deepseek_vision_api.translateVision error:', err);
     return { success: false, error: err && err.message ? err.message : String(err) };
   }
 }

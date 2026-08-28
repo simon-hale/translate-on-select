@@ -1,4 +1,4 @@
-export async function translate({ text, target, serverUrl, httpMethod = 'POST', brand, meta = {} }) {
+export async function translate({ text, target, serverUrl, httpMethod = 'POST', brand }) {
   if (!serverUrl) return { success: false, error: 'missing_server_url' };
   if (!text) return { success: false, error: 'missing_text' };
 

@@ -1,6 +1,6 @@
 # Translate-on-Select Privacy Policy and Secure Handling Disclosure
 
-Updated: 2026-04-25
+Updated: 2026-08-28
 
 Languages: **English** | [简体中文](./PrivacyPolicyAndSecure.zh-CN.md) | [繁體中文](./PrivacyPolicyAndSecure.zh-TW.md)
 
@@ -13,6 +13,7 @@ The sole purpose of this extension is to translate text that a user actively sel
 This extension currently processes the following data:
 
 - Text actively selected by the user on a webpage.
+- The screenshot of the visible area of the current tab when the user actively starts screenshot translation: the image is captured only after the user clicks the `Capture` entry in the popup, and it is sent to the provider only after the user selects, adjusts, and confirms a region.
 - The target language selected by the user.
 - Configuration items entered or selected by the user in the popup or options page, including:
   - Operating mode (custom server mode / custom API mode)
@@ -39,12 +40,17 @@ This extension does not provide user registration, login, advertising, analytics
 
 It is important to note that this extension injects a content script into webpages that match `<all_urls>` so it can show a translation button when the user selects text. Although it runs in the webpage environment, the current implementation reads only the selected text when the user selects text and triggers translation, and does not proactively upload the entire page content.
 
+### Permission: `activeTab`
+
+This extension requests the `activeTab` permission. It is used solely to capture the visible area of the currently active tab when the user actively starts the screenshot translation flow (clicking the `Capture` entry in the popup). The permission does not grant access to browsing history, cookies, or any other tabs, and it is not used for analytics, tracking, or any other purpose. The captured screenshot is kept only in memory, is sent to the selected provider for translation only after the user confirms the selected region, and is discarded immediately after the request completes.
+
 ## 2. How we collect this data
 
 This extension processes data in the following ways:
 
 - When the user visits a webpage, the content script runs in the page to support the "show a translation button after text selection" feature.
 - When the user actively selects text and clicks the translation button, the extension reads that selected text and sends it to the background script for processing.
+- When the user clicks the `Capture` entry in the popup, the extension captures the visible area of the current tab, lets the user select and adjust a region, and – after the user confirms – sends that region image to the background script for vision translation.
 - When the user enters API keys, a server address, or other settings in the popup or options page, the extension stores those settings in the current browser’s `chrome.storage.local`.
 - When the user clicks the "Copy" button, the translation result is written to the local clipboard.
 
@@ -54,7 +60,7 @@ This extension does not automatically and continuously upload user-selected webp
 
 This extension uses the processed data only for the following purposes:
 
-- To perform the translation function requested by the user.
+- To perform the translation function requested by the user (text translation or screenshot translation).
 - To choose the target language, translation service, or server endpoint based on the user’s settings.
 - To display translation results in the page UI.
 - To save the user’s local preferences and connection settings so they do not have to be entered repeatedly.
@@ -83,6 +89,8 @@ In this mode:
 - The user’s selected text is sent to the chosen provider in order to complete the translation.
 - The target language parameter is also sent.
 - The corresponding API Key is sent to the chosen provider as authentication information.
+
+In Flash-Vision mode, screenshot translation also sends the region image confirmed by the user to DeepSeek through the vision model endpoint. Only the image region that the user selected and confirmed is sent; the full page or tab content is never uploaded.
 
 ### 4.2 Custom server mode
 
@@ -127,7 +135,7 @@ This extension stores the following configuration items in the current browser�
 Retention is as follows:
 
 - The configuration items above remain stored in the current browser until the user actively clears them, resets the extension settings, clears extension data in the browser, or uninstalls the extension.
-- Selected text and translation results are not persistently stored long term by this extension; they are primarily kept in memory only during the current request and while being displayed on the current page.
+- Selected text, translation results, and captured screenshots are not persistently stored by this extension; they are kept in memory only during the current request and while being displayed on the current page. Screenshots are discarded immediately after use and are never written to local storage.
 
 Users can manage or delete data in the following ways:
 
@@ -142,6 +150,7 @@ We aim to describe the current implementation in line with Chrome Web Store secu
 
 - In direct API mode, the current code sends translation requests over HTTPS to endpoints such as `https://api.deepl.com`, `https://api-free.deepl.com`, and `https://api.deepseek.com`.
 - In custom server mode, the server address is entered by the user. To protect selected text and related data in transit, users should configure only trusted servers that use HTTPS.
+- Screenshot translation sends the captured region image to DeepSeek over HTTPS only after the user confirms the region. The screenshot is not stored locally, is not sent to any third party other than the selected provider, and is discarded as soon as the translation request finishes.
 - If the user enters a non-HTTPS address, data transmission may not be encrypted; that risk comes from the user’s custom server configuration.
 - API Keys are authentication information. The current implementation stores API Keys in `chrome.storage.local` for reuse, and users can delete them at any time from the settings page.
 - The current implementation does not publicly display the user’s API Keys and does not collect payment information as part of the extension’s functionality.

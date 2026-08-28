@@ -58,8 +58,10 @@ This project is a plain JavaScript Chrome Extension built on Manifest V3. It sup
 - 🌗 Popup theme toggle with shared light/dark styling across the popup, options page, and in-page overlay
 - 🌍 Three-language interface switch: English, Simplified Chinese, and Traditional Chinese
 - 🔤 DeepL direct API support
-- 🤖 DeepSeek direct API support
-- 📡 Optional streaming output for direct DeepSeek API mode
+- 🤖 DeepSeek direct API support with three V4 models: Flash, Pro, and Flash-Vision
+- 📡 Optional streaming output for the DeepSeek V4 models
+- 🖼️ Screenshot translation: draw an adjustable region on the current tab and translate it with the Flash-Vision model
+- 🎛️ Themed custom dropdowns replace native `<select>` controls in the popup and options page
 - 🖥️ Server relay mode for self-hosted translation routing
 
 ## Supported Target Languages 🌍
@@ -95,16 +97,17 @@ This project is a plain JavaScript Chrome Extension built on Manifest V3. It sup
 
 - `menu/` is the quick popup:
   - choose target language
-  - choose interface language
   - switch between `server` and `api` mode
   - switch active provider quickly
+  - choose the DeepSeek V4 model (Flash / Pro / Flash-Vision)
   - toggle between light and dark mode
+  - the screenshot entry (`Capture`) appears next to the title in Flash-Vision mode
 - `options/` is the full settings page:
   - save interface language
   - save backend URL and backend endpoint type
   - save DeepL API key and endpoint type
   - save DeepSeek API key
-  - choose the Deepseek V4 model
+  - choose the DeepSeek V4 model and the streaming mode
 
 ## Translation Modes 🔀
 
@@ -165,9 +168,9 @@ There is no build step right now. You can load the project directly as an unpack
 Use the popup to:
 
 - choose the target language
-- choose the interface language
 - choose `自定义服务器` or `自定义 API`
 - switch the active provider quickly
+- choose the DeepSeek V4 model
 - toggle between light and dark mode
 
 Popup interface overview:
@@ -202,7 +205,8 @@ Optional:
 - choose the Deepseek V4 model:
   - `Flash` (`deepseek-v4-flash`)
   - `Pro` (`deepseek-v4-pro`)
-- enable or disable streaming in the popup
+  - `Flash-Vision` (`deepseek-v4-flash-vision-exp`) — enables the screenshot translation entry
+- enable or disable streaming in the options page
 
 #### C. Server relay
 
@@ -225,6 +229,7 @@ Optional:
 - Selected text longer than `2400` characters is rejected in the current implementation.
 - The result popup can be copied manually.
 - The popup does not auto-close by timer in the current implementation.
+- Screenshot translation (Flash-Vision): click `Capture` in the popup, drag to select a region, adjust it with the resize handles, and confirm. The captured region is kept in memory, sent to DeepSeek only after confirmation, and discarded immediately after use. In Flash-Vision mode, text-selection translation stays available and uses the same Flash-Vision model with the original text prompt, while screenshot requests use a dedicated vision prompt.
 - The interface supports English, Simplified Chinese, and Traditional Chinese.
 - The saved theme mode is reused by the popup, options page, and in-page overlay.
 
@@ -237,6 +242,8 @@ Optional:
 │  └─ api/
 │     ├─ deepl_api.js            # Direct DeepL adapter
 │     ├─ deepseek_api.js         # Direct DeepSeek adapter
+│     ├─ deepseek_vision_api.js  # DeepSeek flash-vision adapter (screenshot translation)
+│     ├─ sse_reader.js           # Shared SSE streaming reader
 │     └─ server_api.js           # Relay backend adapter
 ├─ front/
 │  └─ contentScript.js           # Selection handling + in-page popup UI
@@ -248,6 +255,7 @@ Optional:
 │  └─ options.js                 # Settings persistence and UI switching
 ├─ shared/
 │  ├─ i18n.js                    # UI language resources and localization helpers
+│  ├─ select.js                  # Themed custom dropdown component
 │  └─ theme.js                   # Light/dark theme helpers
 ├─ icons/
 ├─ PrivacyPolicyAndSecure.md     # Privacy policy (English)

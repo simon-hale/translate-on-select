@@ -8,62 +8,41 @@
   </head>
 
   <body>
-    <main class="popup-shell">
-      <div class="ambient ambient-one"></div>
-      <div class="ambient ambient-two"></div>
-
-      <section class="panel control-panel">
-        <div class="panel-header">
-          <p class="eyebrow">Translate on Select</p>
+    <main>
+      <header class="page-head">
+        <div class="page-head-row">
           <h1 data-i18n="menu.heading">划词翻译</h1>
+          <div id="visionGroup" class="vision-entry">
+            <span class="vision-divider" aria-hidden="true"></span>
+            <button id="visionCaptureBtn" class="vision-button" type="button" data-i18n="menu.visionButton">截图</button>
+          </div>
         </div>
+      </header>
 
+      <section class="controls">
         <div class="field-group">
           <label class="field-label" for="targetLang" data-i18n="menu.targetLanguageLabel">目标语言</label>
-          <div class="select-wrap">
-            <select id="targetLang" data-i18n-aria-label="menu.targetLanguageLabel"></select>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label class="field-label" for="uiLanguageSelect" data-i18n="menu.uiLanguageLabel">界面语言</label>
-          <div class="select-wrap">
-            <select id="uiLanguageSelect" data-i18n-aria-label="menu.uiLanguageLabel"></select>
-          </div>
+          <select id="targetLang" data-i18n-aria-label="menu.targetLanguageLabel"></select>
         </div>
 
         <div class="field-group">
           <label class="field-label" for="quickModeSelect" data-i18n="menu.quickModeLabel">快速切换模式</label>
-          <div class="select-wrap">
-            <select id="quickModeSelect" data-i18n-aria-label="menu.quickModeLabel"></select>
-          </div>
+          <select id="quickModeSelect" data-i18n-aria-label="menu.quickModeLabel"></select>
         </div>
 
         <div class="field-group" id="quickServerGroup" hidden>
           <label class="field-label" for="quickApiSelectServer" data-i18n="menu.quickServerLabel">服务器端点</label>
-          <div class="select-wrap">
-            <select id="quickApiSelectServer" data-i18n-aria-label="menu.quickServerLabel"></select>
-          </div>
+          <select id="quickApiSelectServer" data-i18n-aria-label="menu.quickServerLabel"></select>
         </div>
 
         <div class="field-group" id="quickApiGroup" hidden>
           <label class="field-label" for="quickApiSelect" data-i18n="menu.quickApiLabel">API 来源</label>
-          <div class="select-wrap">
-            <select id="quickApiSelect" data-i18n-aria-label="menu.quickApiLabel"></select>
-          </div>
+          <select id="quickApiSelect" data-i18n-aria-label="menu.quickApiLabel"></select>
         </div>
 
         <div class="field-group" id="deepseekModelGroup" hidden>
           <label class="field-label" for="deepseekModelSelect" data-i18n="menu.deepseekModelLabel">Deepseek V4 Model</label>
-          <div class="select-wrap">
-            <select id="deepseekModelSelect" data-i18n-aria-label="menu.deepseekModelLabel"></select>
-          </div>
-        </div>
-        <div class="field-group" id="streamGroup" hidden>
-          <label class="field-label" for="streamDeepseekSelect" data-i18n="menu.streamModeLabel">Deepseek 输出模式</label>
-          <div class="select-wrap">
-            <select id="streamDeepseekSelect" data-i18n-aria-label="menu.streamModeLabel"></select>
-          </div>
+          <select id="deepseekModelSelect" data-i18n-aria-label="menu.deepseekModelLabel"></select>
         </div>
       </section>
 
@@ -80,6 +59,7 @@
 
     <script src="../shared/i18n.js"></script>
     <script src="../shared/theme.js"></script>
+    <script src="../shared/select.js"></script>
     <script src="menu.js"></script>
   </body>
 </html>

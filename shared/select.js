@@ -3,9 +3,17 @@
 // 视觉由自定义触发器 + 圆角面板呈现，样式完全可控并跟随主题。
 // 点击选项时写入 select.value 并触发原生 change 事件，
 // 因此引用方读取 value / 监听 change 的逻辑保持不变。
+// 同一时间只允许一个下拉展开（互斥）。
 (function (global) {
   // 所有已增强实例，由共享的全局监听统一管理关闭
   const wraps = [];
+
+  // 互斥展开：关闭所有下拉，可排除当前操作的那个
+  function closeAll(except) {
+    for (const wrap of wraps) {
+      if (wrap !== except) wrap.classList.remove('is-open');
+    }
+  }
 
   function selectedText(selectEl) {
     const opt = selectEl.options && selectEl.options[selectEl.selectedIndex];
@@ -60,8 +68,10 @@
 
     trigger.addEventListener('click', (event) => {
       event.stopPropagation();
-      if (wrap.classList.contains('is-open')) wrap.classList.remove('is-open');
-      else {
+      if (wrap.classList.contains('is-open')) {
+        wrap.classList.remove('is-open');
+      } else {
+        closeAll(wrap);
         renderMenu();
         wrap.classList.add('is-open');
       }
@@ -91,12 +101,8 @@
   });
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-      for (const wrap of wraps) {
-        wrap.classList.remove('is-open');
-      }
-    }
+    if (event.key === 'Escape') closeAll();
   });
 
-  global.TranslateOnSelectSelect = { enhance, enhanceAll };
+  global.TranslateOnSelectSelect = { enhance, enhanceAll, closeAll };
 })(globalThis);

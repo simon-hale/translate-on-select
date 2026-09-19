@@ -58,9 +58,9 @@ This project is a plain JavaScript Chrome Extension built on Manifest V3. It sup
 - 🌗 Popup theme toggle with shared light/dark styling across the popup, options page, and in-page overlay
 - 🌍 Three-language interface switch: English, Simplified Chinese, and Traditional Chinese
 - 🔤 DeepL direct API support
-- 🤖 DeepSeek direct API support with three V4 models: Flash, Pro, and Flash-Vision
-- 📡 Optional streaming output for the DeepSeek V4 models
-- 🖼️ Screenshot translation: draw an adjustable region on the current tab and translate it with the Flash-Vision model
+- 🤖 DeepSeek direct API support with two V4 branches: Flash and Pro
+- 📡 Optional streaming output for the DeepSeek V4 branches
+- 🖼️ Screenshot translation: draw an adjustable region on the current tab and translate it with the same Flash branch used for text selection
 - 🎛️ Themed custom dropdowns replace native `<select>` controls in the popup and options page
 - 🖥️ Server relay mode for self-hosted translation routing
 
@@ -99,15 +99,15 @@ This project is a plain JavaScript Chrome Extension built on Manifest V3. It sup
   - choose target language
   - switch between `server` and `api` mode
   - switch active provider quickly
-  - choose the DeepSeek V4 model (Flash / Pro / Flash-Vision)
+  - choose the DeepSeek V4 branch (Flash / Pro)
   - toggle between light and dark mode
-  - the screenshot entry (`Capture`) appears next to the title in Flash-Vision mode
+  - the screenshot entry (`Capture`) appears next to the title when the Flash branch is active
 - `options/` is the full settings page:
   - save interface language
   - save backend URL and backend endpoint type
   - save DeepL API key and endpoint type
   - save DeepSeek API key
-  - choose the DeepSeek V4 model and the streaming mode
+  - choose the DeepSeek V4 branch and the streaming mode
 
 ## Translation Modes 🔀
 
@@ -120,11 +120,14 @@ Supported providers:
 - DeepL
 - DeepSeek
 
-Current status:
+#### DeepSeek V4 branches
 
-- DeepL: implemented
-- DeepSeek: implemented
-- Google Translate: UI placeholder exists, but it is not implemented yet
+The direct DeepSeek API exposes two branches, both served by the `https://api.deepseek.com` chat completions endpoint:
+
+- `Flash` (`deepseek-flash`): the dual-purpose branch. Text selection translation and screenshot translation are both available, and both share one Flash prompt template that only swaps the translated subject.
+- `Pro` (`deepseek-v4-pro`): text-selection translation only. It does not support screenshot translation, and no screenshot entry is shown for this branch.
+
+The screenshot entry only expands under `Custom API -> DeepSeek V4 -> Flash`; the other branches keep the plain text-selection interaction.
 
 ### 2. Server relay mode 🖥️
 
@@ -170,7 +173,7 @@ Use the popup to:
 - choose the target language
 - choose `自定义服务器` or `自定义 API`
 - switch the active provider quickly
-- choose the DeepSeek V4 model
+- choose the DeepSeek V4 branch (Flash / Pro)
 - toggle between light and dark mode
 
 Popup interface overview:
@@ -202,11 +205,12 @@ Required:
 
 Optional:
 
-- choose the Deepseek V4 model:
-  - `Flash` (`deepseek-v4-flash`)
-  - `Pro` (`deepseek-v4-pro`)
-  - `Flash-Vision` (`deepseek-v4-flash-vision-exp`) — enables the screenshot translation entry
+- choose the DeepSeek V4 branch:
+  - `Flash` (`deepseek-flash`) — text-selection translation plus the screenshot translation entry
+  - `Pro` (`deepseek-v4-pro`) — text-selection translation only, no screenshot support
 - enable or disable streaming in the options page
+
+Legacy model names `deepseek-v4-flash` and `deepseek-v4-flash-vision-exp` are still accepted by the API, but both are served by the current Flash model and billed at Flash pricing. The extension migrates such stored values to `deepseek-flash` automatically.
 
 #### C. Server relay
 
@@ -214,7 +218,7 @@ Required:
 
 - server URL
 - endpoint type:
-  - `Deepseek V4`
+  - `DeepSeek V4`
   - `DeepL`
 
 Optional:
@@ -229,9 +233,10 @@ Optional:
 - Selected text longer than `2400` characters is rejected in the current implementation.
 - The result popup can be copied manually.
 - The popup does not auto-close by timer in the current implementation.
-- Screenshot translation (Flash-Vision): click `Capture` in the popup, drag to select a region, adjust it with the resize handles, and confirm. The captured region is kept in memory, sent to DeepSeek only after confirmation, and discarded immediately after use. In Flash-Vision mode, text-selection translation stays available and uses the same Flash-Vision model with the original text prompt, while screenshot requests use a dedicated vision prompt.
+- Screenshot translation (Flash branch): click `Capture` in the popup, drag to select a region, adjust it with the resize handles, and confirm. The captured region is kept in memory, sent to DeepSeek only after confirmation, and discarded immediately after use. In the Flash branch, text-selection translation stays available and uses the same Flash model and the same prompt template — only the translated subject changes (selected text vs. text visible in the image).
 - The interface supports English, Simplified Chinese, and Traditional Chinese.
 - The saved theme mode is reused by the popup, options page, and in-page overlay.
+- Themed dropdowns expand one at a time: opening a dropdown closes any other open dropdown.
 
 ## Project Structure 📁
 
@@ -241,8 +246,7 @@ Optional:
 │  ├─ background.js              # Dispatcher and provider routing
 │  └─ api/
 │     ├─ deepl_api.js            # Direct DeepL adapter
-│     ├─ deepseek_api.js         # Direct DeepSeek adapter
-│     ├─ deepseek_vision_api.js  # DeepSeek flash-vision adapter (screenshot translation)
+│     ├─ deepseek_api.js         # Direct DeepSeek adapter (Flash text + Flash screenshot, Pro text)
 │     ├─ sse_reader.js           # Shared SSE streaming reader
 │     └─ server_api.js           # Relay backend adapter
 ├─ front/
@@ -283,7 +287,7 @@ Optional:
 ### `background/api/*.js`
 
 - `deepl_api.js`: calls DeepL REST API
-- `deepseek_api.js`: calls DeepSeek Chat Completions API
+- `deepseek_api.js`: calls the DeepSeek Chat Completions API; one adapter handles the text prompt and the screenshot prompt
 - `server_api.js`: calls your custom backend
 
 ### `shared/*.js`
@@ -324,7 +328,6 @@ This project is convenient, but not hardened.
 
 ## Limitations ⚠️
 
-- Google Translate is not implemented yet
 - Screenshots currently focus on the Simplified Chinese interface
 - No automated tests are included
 - No build pipeline or packaging flow is included
@@ -343,7 +346,6 @@ Recommended local workflow:
 
 ## Roadmap Ideas 💡
 
-- Implement Google Translate support
 - Improve secrets handling
 - Add screenshots and demo GIFs
 - Improve localization

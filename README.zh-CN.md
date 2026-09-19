@@ -4,7 +4,7 @@
 
 # Translate-on-Select
 
-一个轻量的 Chrome 划词翻译扩展。选中文本后点击按钮，即可在当前页面内查看翻译结果。
+一个轻量的 Chrome 划词翻译扩展。选中文字后点击按钮，即可在当前页面内查看翻译结果。
 
 </div>
 
@@ -50,17 +50,17 @@
 
 ## 功能特性
 
-- 🌐 在普通网页中翻译选中的文本
-- 🖱️ 选中文本后会出现浮动 `翻译` 按钮
+- 🌐 在普通网页中翻译选中的文字
+- 🖱️ 选中文字后会出现浮动 `翻译` 按钮
 - 💬 页面内结果弹层支持 `复制` 和 `关闭`
 - ⚡ 提供快速设置 popup 用于常用切换
 - ⚙️ 提供完整 options 页面用于 API Key 和后端配置
 - 🌗 popup 内置浅色 / 深色切换，并在 popup、options 页面和页内翻译弹层之间共享主题
 - 🌍 支持三语言界面切换：English、简体中文、繁体中文
 - 🔤 支持 DeepL 直连 API
-- 🤖 DeepSeek 直连 API 支持三种 V4 模型：Flash、Pro 和 Flash-Vision
-- 📡 DeepSeek V4 模型支持可选流式输出
-- 🖼️ 截图翻译：在当前标签页上框选可调整的区域，使用 Flash-Vision 模型翻译
+- 🤖 DeepSeek 直连 API 支持两个 V4 分支：Flash 和 Pro
+- 📡 DeepSeek V4 分支支持可选流式输出
+- 🖼️ 截图翻译：在当前标签页上框选可调整的区域，使用与划词相同的 Flash 分支翻译
 - 🎛️ popup 与 options 页面使用主题化的自定义下拉菜单替代原生 `<select>` 控件
 - 🖥️ 支持自建后端中转翻译请求
 
@@ -87,9 +87,9 @@
 ### 用户流程 🚀
 
 1. 打开任意支持的网页。
-2. 选中一段文本。
+2. 选中一段文字。
 3. 点击浮动 `翻译` 按钮。
-4. 扩展将文本发送给后台 service worker。
+4. 扩展将文字发送给后台 service worker。
 5. 后台根据当前保存的配置决定走哪条翻译链路。
 6. 翻译结果显示在当前页面的结果弹层中。
 
@@ -99,15 +99,15 @@
   - 选择目标语言
   - 切换 `server` 和 `api` 模式
   - 快速切换当前翻译来源
-  - 选择 DeepSeek V4 模型（Flash / Pro / Flash-Vision）
+  - 选择 DeepSeek V4 分支（Flash / Pro）
   - 切换浅色 / 深色主题
-  - Flash-Vision 模式下，标题右侧会出现截图翻译入口
+  - Flash 分支下，标题右侧会出现截图翻译入口
 - `options/` 是完整设置页：
   - 保存界面语言
   - 保存后端 URL 和后端端点类型
   - 保存 DeepL API Key 和 endpoint 类型
   - 保存 DeepSeek API Key
-  - 选择 DeepSeek V4 模型和流式输出模式
+  - 选择 DeepSeek V4 分支和流式输出模式
 
 ## 翻译模式 🔀
 
@@ -120,11 +120,14 @@
 - DeepL
 - DeepSeek
 
-当前状态：
+#### DeepSeek V4 分支
 
-- DeepL：已实现
-- DeepSeek：已实现
-- Google Translate：界面入口已预留，但当前尚未实现
+DeepSeek 直连 API 提供两个分支，两者都调用 `https://api.deepseek.com` 的 chat completions 接口：
+
+- `Flash`（`deepseek-flash`）：双功能分支。划词翻译与截图翻译同时可用，两者共用同一套 Flash 提示词。
+- `Pro`（`deepseek-v4-pro`）：只做纯文本划词翻译，不支持截图翻译，也不显示截图入口。
+
+截图入口只在 `自定义 API -> DeepSeek V4 -> Flash` 下展开，其他分支保持纯文字划词的交互逻辑。
 
 ### 2. 后端中转模式 🖥️
 
@@ -147,7 +150,7 @@
 }
 ```
 
-项目当前 README 中提到的配套后端仓库：
+项目当前 README 中提到的配套后端项目：
 
 - [translate-on-select-backend](https://github.com/simon-hale/translate-on-select-backend)
 
@@ -155,7 +158,7 @@
 
 当前项目没有构建步骤，可以直接作为 unpacked extension 加载。
 
-1. 克隆或下载本仓库。
+1. 克隆或下载本项目。
 2. 打开 Chrome，进入 `chrome://extensions/`。
 3. 打开 `Developer mode`。
 4. 点击 `Load unpacked`。
@@ -170,7 +173,7 @@
 - 选择目标语言
 - 选择 `自定义服务器` 或 `自定义 API`
 - 快速切换当前 provider
-- 选择 DeepSeek V4 模型
+- 选择 DeepSeek V4 分支
 - 切换浅色 / 深色主题
 
 Popup 界面概览：
@@ -202,11 +205,12 @@ Options 界面概览：
 
 可选：
 
-- 选择 Deepseek V4 模型：
-  - `Flash` (`deepseek-v4-flash`)
-  - `Pro` (`deepseek-v4-pro`)
-  - `Flash-Vision` (`deepseek-v4-flash-vision-exp`) —— 启用截图翻译入口
+- 选择 DeepSeek V4 分支：
+  - `Flash` (`deepseek-flash`) —— 划词翻译 + 截图翻译入口
+  - `Pro` (`deepseek-v4-pro`) —— 仅纯文本划词翻译，不支持截图
 - 在 options 页面开启或关闭流式输出
+
+旧模型名 `deepseek-v4-flash` 和 `deepseek-v4-flash-vision-exp` 仍可被 API 调用，但都由当前 Flash 模型提供服务并按 Flash 价格计费；扩展会自动把配置中的旧取值迁移为 `deepseek-flash`。
 
 #### C. 后端中转
 
@@ -214,7 +218,7 @@ Options 界面概览：
 
 - server URL
 - 端点类型：
-  - `Deepseek V4`
+  - `DeepSeek V4`
   - `DeepL`
 
 可选：
@@ -225,13 +229,14 @@ Options 界面概览：
 ## 使用说明 📝
 
 - 扩展会把 content script 注入到 `<all_urls>`。
-- 只有在选中文本后，才会出现浮动翻译按钮。
-- 当前实现中，选中文本长度超过 `2400` 字符会被拒绝。
+- 只有在选中文字后，才会出现浮动翻译按钮。
+- 当前实现中，选中文字长度超过 `2400` 字符会被拒绝。
 - 结果弹层支持手动复制。
 - 当前实现中，结果弹层不会自动定时关闭。
-- 截图翻译（Flash-Vision）：在 popup 中点击 `截图`，拖动框选区域，通过手柄调整后确认。截图区域仅保留在内存中，确认后才发送给 DeepSeek，使用后立即丢弃。Flash-Vision 模式下，划词翻译仍然可用，文字请求使用原文字翻译提示词调用同一 Flash-Vision 模型，截图请求使用专门的视觉提示词。
+- 截图翻译（Flash 分支）：在 popup 中点击 `截图`，拖动框选区域，通过手柄调整后确认。截图区域仅保留在内存中，确认后才发送给 DeepSeek，使用后立即丢弃。Flash 分支下划词翻译仍可使用，文字请求与截图请求调用同一 Flash 模型、共用同一套提示词模板，只是翻译对象不同（选中文字 / 图片中可见文字）。
 - 界面支持 English、简体中文 和 繁体中文 三种语言。
 - 保存后的主题模式会复用到 popup、options 页面和页内翻译浮层。
+- 自绘下拉同一时间只展开一个：展开某个下拉时会自动收起其他已展开的下拉。
 
 ## 项目结构 📁
 
@@ -241,8 +246,7 @@ Options 界面概览：
 │  ├─ background.js              # 后台分发器与 provider 路由
 │  └─ api/
 │     ├─ deepl_api.js            # DeepL 直连适配器
-│     ├─ deepseek_api.js         # DeepSeek 直连适配器
-│     ├─ deepseek_vision_api.js  # DeepSeek flash-vision 适配器（截图翻译）
+│     ├─ deepseek_api.js         # DeepSeek 直连适配器（Flash 划词 + Flash 截图，Pro 划词）
 │     ├─ sse_reader.js           # 共享 SSE 流式解析器
 │     └─ server_api.js           # 后端中转适配器
 ├─ front/
@@ -268,7 +272,7 @@ Options 界面概览：
 
 ### `front/contentScript.js`
 
-- 监听文本选择行为
+- 监听文字选择行为
 - 创建浮动翻译按钮
 - 显示 loading 和结果弹层
 - 接收后台转发来的流式内容
@@ -283,7 +287,7 @@ Options 界面概览：
 ### `background/api/*.js`
 
 - `deepl_api.js`：请求 DeepL REST API
-- `deepseek_api.js`：请求 DeepSeek Chat Completions API
+- `deepseek_api.js`：请求 DeepSeek Chat Completions API；同一个适配器同时处理文字提示词与截图提示词
 - `server_api.js`：请求你自己的后端服务
 
 ### `shared/*.js`
@@ -308,7 +312,7 @@ Options 界面概览：
 
 ## 隐私政策 🔒
 
-仓库中提供了三种语言版本的隐私政策文本：
+仓库中提供了三种语言版本的隐私政策文件：
 
 - [English](./PrivacyPolicyAndSecure.md)
 - [简体中文](./PrivacyPolicyAndSecure.zh-CN.md)
@@ -324,7 +328,6 @@ Options 界面概览：
 
 ## 当前限制 ⚠️
 
-- Google Translate 尚未实现
 - 当前截图主要展示简体中文界面
 - 当前没有自动化测试
 - 当前没有打包或发布流水线
@@ -332,18 +335,17 @@ Options 界面概览：
 
 ## 开发 👨‍💻
 
-这个仓库目前足够简单，适合直接修改源码然后在 Chrome 中 reload 调试。
+这个项目目前足够简单，适合直接修改源码然后在 Chrome 中 reload 调试。
 
 推荐本地开发流程：
 
-1. 修改仓库中的文件。
+1. 修改项目中的文件。
 2. 打开 `chrome://extensions/`。
 3. 重新加载这个 unpacked extension。
 4. 重新验证 popup、options 页面和网页中的划词翻译流程。
 
 ## 路线图 💡
 
-- 支持 Google Translate
 - 改进密钥与敏感信息管理方式
 - 补充截图和演示 GIF
 - 提升多语言支持

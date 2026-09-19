@@ -1,7 +1,6 @@
 import { translate as translateDeepl } from './api/deepl_api.js';
-import { translate as translateDeepseek } from './api/deepseek_api.js';
+import { translate as translateDeepseek, FLASH_MODEL, PRO_MODEL } from './api/deepseek_api.js';
 import { translate as translateServer } from './api/server_api.js';
-import { translateVision } from './api/deepseek_vision_api.js';
 
 console.log('BG: Quick Select Translate (dispatcher) loaded');
 
@@ -40,6 +39,27 @@ async function streamToTab(iterable, tabId) {
   }
 }
 
+// helper: forward a provider result (plain object or async iterable) to the page
+async function respondWithResult(resultOrIterable, sender, sendResponse) {
+  if (isAsyncIterable(resultOrIterable)) {
+    const tabId = sender && sender.tab && sender.tab.id ? sender.tab.id : null;
+    sendResponse(await streamToTab(resultOrIterable, tabId));
+    return;
+  }
+  sendResponse(resultOrIterable);
+}
+
+// 模型名归一化：仅 Pro 为纯文本划词分支（不支持截图），其余取值（含历史遗留的
+// deepseek-v4-flash / deepseek-v4-flash-vision-exp）统一落到 Flash。
+function resolveDeepseekModel(storedModel) {
+  return storedModel === PRO_MODEL ? PRO_MODEL : FLASH_MODEL;
+}
+
+// API 品牌归一化：google-api 分支已下线，历史配置统一回落到当前默认品牌。
+function resolveApiBrand(storedBrand) {
+  return storedBrand === 'deepl-api' || storedBrand === 'deepseek-api' ? storedBrand : 'deepseek-api';
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   // Keep listener non-blocking but we'll use async flow and return true for async response.
   (async () => {
@@ -75,7 +95,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return;
       }
 
-      if (msg.action !== 'translate' && msg.action !== 'translate_vision') {
+      const isVision = msg.action === 'translate_vision';
+      if (msg.action !== 'translate' && !isVision) {
         sendResponse({ success: false, error: 'unsupported_action' });
         return;
       }
@@ -90,49 +111,33 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
       // 赋值本地数据
       const backendMode = items && items.backendMode ? items.backendMode : 'server';
-      const apiBrand = items && items.apiBrand ? items.apiBrand : 'deepl-api'; // default if api mode
+      const storedBrand = items && items.apiBrand ? items.apiBrand : 'deepl-api'; // default if api mode
+      const apiBrand = resolveApiBrand(storedBrand);
       const targetFormat = normalizeTargetForBrand(apiBrand, msg.target || items && items.targetLanguage || 'ZH-HANS');
       const streamDeepseek = items && items.streamDeepseek ? (items.streamDeepseek === 'true') : false;
-      const deepseekModel = items && items.deepseekModel ? items.deepseekModel : 'deepseek-v4-flash';
+      const deepseekModel = resolveDeepseekModel(items && items.deepseekModel);
 
-      // 视觉翻译：仅针对 api 模式下的 deepseek 接口新增
-      if (msg.action === 'translate_vision') {
+      // 旧配置兼容：google-api 分支已下线，把 storage 中的残留取值迁移到当前默认品牌
+      if (storedBrand !== apiBrand) {
+        chrome.storage.local.set({ apiBrand });
+      }
+
+      // 截图翻译的前置门禁：只有「自定义 API -> DeepSeek V4 -> Flash」才允许继续，
+      // 其余情况（自定义服务器、其他 provider、Pro 模型）一律在此立即返回，
+      // 不会落入 server / DeepL 等分支。
+      if (isVision) {
         if (backendMode !== 'api' || apiBrand !== 'deepseek-api') {
           sendResponse({ success: false, error: 'vision_requires_deepseek_api' });
           return;
         }
-        if (deepseekModel !== 'deepseek-v4-flash-vision-exp') {
-          sendResponse({ success: false, error: 'vision_requires_flash_vision_model' });
+        if (deepseekModel !== FLASH_MODEL) {
+          sendResponse({ success: false, error: 'vision_requires_flash_model' });
           return;
         }
-
-        const deepseekApiKey = items && items.deepseekApiKey ? items.deepseekApiKey : null;
-        if (!deepseekApiKey) {
-          sendResponse({ success: false, error: 'missing_api_key' });
-          return;
-        }
-
-        if (!msg.imageDataUrl || typeof msg.imageDataUrl !== 'string') {
+        if (typeof msg.imageDataUrl !== 'string' || !msg.imageDataUrl) {
           sendResponse({ success: false, error: 'missing_image' });
           return;
         }
-
-        const visionTarget = normalizeTargetForBrand('deepseek-api', items && items.targetLanguage || 'ZH-HANS');
-        const resultOrIterable = await translateVision({
-          imageDataUrl: msg.imageDataUrl,
-          target: visionTarget,
-          apiKey: deepseekApiKey,
-          streamDeepseek
-        });
-
-        if (isAsyncIterable(resultOrIterable)) {
-          const tabId = sender && sender.tab && sender.tab.id ? sender.tab.id : null;
-          const streamResult = await streamToTab(resultOrIterable, tabId);
-          sendResponse(streamResult);
-        } else {
-          sendResponse(resultOrIterable);
-        }
-        return;
       }
 
       // 判断后端服务器模式
@@ -146,7 +151,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           return;
         }
 
-        // 调用翻译（可能返回 async iterable）
+        // 中转后端只有纯文本划词接口；截图请求已在上面被门禁拦下
         const resultOrIterable = await translateServer({
           text: msg.text,
           target: targetFormat,
@@ -155,85 +160,59 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           brand: apiServer
         });
 
-        if (isAsyncIterable(resultOrIterable)) {
-          const tabId = sender && sender.tab && sender.tab.id ? sender.tab.id : null;
-          const streamResult = await streamToTab(resultOrIterable, tabId);
-          sendResponse(streamResult);
-          return;
-        } else {
-          // 非流式结果（对象）
-          sendResponse(resultOrIterable);
-          return;
-        }
-      } else if (backendMode === 'api') {
-
-        if (apiBrand === 'deepl-api') {
-
-          // 赋值apikey-deepl和版本
-          const deeplApiKey = items && items.deeplApiKey ? items.deeplApiKey : null;
-          const deeplEndpoint = items && items.deeplEndpoint ? items.deeplEndpoint : 'free-deepl';
-          if (!deeplApiKey) {
-            sendResponse({ success: false, error: 'missing_api_key' });
-            return;
-          }
-
-          const resultOrIterable = await translateDeepl({
-            text: msg.text,
-            target: targetFormat,
-            apiKey: deeplApiKey,
-            endpointKey: deeplEndpoint,
-            meta: { from: 'deepl' }
-          });
-
-          if (isAsyncIterable(resultOrIterable)) {
-            const tabId = sender && sender.tab && sender.tab.id ? sender.tab.id : null;
-            const streamResult = await streamToTab(resultOrIterable, tabId);
-            sendResponse(streamResult);
-            return;
-          } else {
-            sendResponse(resultOrIterable);
-            return;
-          }
-
-        } else if (apiBrand === 'deepseek-api') {
-          // 赋值apikey-deepseek
-          const deepseekApiKey = items && items.deepseekApiKey ? items.deepseekApiKey : null;
-          if (!deepseekApiKey) {
-            sendResponse({ success: false, error: 'missing_api_key' });
-            return;
-          }
-
-          const resultOrIterable = await translateDeepseek({
-            text: msg.text,
-            target: targetFormat,
-            apiKey: deepseekApiKey,
-            streamDeepseek,
-            deepseekModel
-          });
-
-          if (isAsyncIterable(resultOrIterable)) {
-            const tabId = sender && sender.tab && sender.tab.id ? sender.tab.id : null;
-            const streamResult = await streamToTab(resultOrIterable, tabId);
-            sendResponse(streamResult);
-            return;
-          } else {
-            sendResponse(resultOrIterable);
-            return;
-          }
-
-        } else if (apiBrand === 'google-api') {
-          // 待适配
-          sendResponse({ success: false, error: 'google_api_not_implemented' });
-          return;
-        } else {
-          // 暂不支持的api品牌
-          sendResponse({ success: false, error: 'unknown_api_brand' });
-          return;
-        }
+        await respondWithResult(resultOrIterable, sender, sendResponse);
+        return;
       }
 
-      // fallback
-      sendResponse({ success: false, error: 'unknown_backend_mode' });
+      if (backendMode !== 'api') {
+        sendResponse({ success: false, error: 'unknown_backend_mode' });
+        return;
+      }
+
+      if (apiBrand === 'deepl-api') {
+        // 赋值apikey-deepl和版本
+        const deeplApiKey = items && items.deeplApiKey ? items.deeplApiKey : null;
+        const deeplEndpoint = items && items.deeplEndpoint ? items.deeplEndpoint : 'free-deepl';
+        if (!deeplApiKey) {
+          sendResponse({ success: false, error: 'missing_api_key' });
+          return;
+        }
+
+        const resultOrIterable = await translateDeepl({
+          text: msg.text,
+          target: targetFormat,
+          apiKey: deeplApiKey,
+          endpointKey: deeplEndpoint,
+          meta: { from: 'deepl' }
+        });
+
+        await respondWithResult(resultOrIterable, sender, sendResponse);
+        return;
+      }
+
+      if (apiBrand !== 'deepseek-api') {
+        sendResponse({ success: false, error: 'unknown_api_brand' });
+        return;
+      }
+
+      // 赋值apikey-deepseek
+      const deepseekApiKey = items && items.deepseekApiKey ? items.deepseekApiKey : null;
+      if (!deepseekApiKey) {
+        sendResponse({ success: false, error: 'missing_api_key' });
+        return;
+      }
+
+      // 走到这里说明已通过上面的截图门禁：截图只可能是 Flash 分支
+      const resultOrIterable = await translateDeepseek({
+        text: isVision ? undefined : msg.text,
+        imageDataUrl: isVision ? msg.imageDataUrl : undefined,
+        target: normalizeTargetForBrand('deepseek-api', items && items.targetLanguage || 'ZH-HANS'),
+        apiKey: deepseekApiKey,
+        model: isVision ? FLASH_MODEL : deepseekModel,
+        stream: streamDeepseek
+      });
+
+      await respondWithResult(resultOrIterable, sender, sendResponse);
     } catch (err) {
       console.error('BG dispatcher error:', err);
       // 尽可能通知页面

@@ -351,12 +351,6 @@ input:focus {
   color: var(--ink-strong);
 }
 
-.empty-state {
-  margin: 0;
-  font-size: 12px;
-  color: var(--ink-soft);
-}
-
 :root[data-theme="dark"] input {
   color: var(--ink-strong);
 }

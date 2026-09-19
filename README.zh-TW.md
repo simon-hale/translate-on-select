@@ -52,15 +52,15 @@
 
 - 🌐 在一般網頁中翻譯選取的文字
 - 🖱️ 選取文字後會出現浮動 `翻譯` 按鈕
-- 💬 頁面內結果彈層支援 `複製` 和 `關閉`
+- 💬 頁面內結果彈層支援 `複製` 與 `關閉`
 - ⚡ 提供快速設定 popup 供常用切換
 - ⚙️ 提供完整 options 頁面用於 API Key 與後端設定
 - 🌗 popup 內建淺色 / 深色切換，並在 popup、options 頁面與頁內翻譯彈層之間共享主題
 - 🌍 支援三語言介面切換：English、簡體中文、繁體中文
 - 🔤 支援 DeepL 直連 API
-- 🤖 DeepSeek 直連 API 支援三種 V4 模型：Flash、Pro 與 Flash-Vision
-- 📡 DeepSeek V4 模型支援可選串流輸出
-- 🖼️ 截圖翻譯：在目前分頁上框選可調整的範圍，以 Flash-Vision 模型翻譯
+- 🤖 DeepSeek 直連 API 支援兩個 V4 分支：Flash 與 Pro
+- 📡 DeepSeek V4 分支支援可選串流輸出
+- 🖼️ 截圖翻譯：在目前分頁上框選可調整的範圍，使用與劃詞相同的 Flash 分支翻譯
 - 🎛️ popup 與設定頁面使用主題化的自訂下拉式選單取代原生 `<select>` 控制項
 - 🖥️ 支援自建後端中轉翻譯請求
 
@@ -86,7 +86,7 @@
 
 ### 使用者流程 🚀
 
-1. 打開任意支援的網頁。
+1. 開啟任意支援的網頁。
 2. 選取一段文字。
 3. 點擊浮動 `翻譯` 按鈕。
 4. 擴充功能將文字送到背景 service worker。
@@ -99,36 +99,39 @@
   - 選擇目標語言
   - 切換 `server` 與 `api` 模式
   - 快速切換目前翻譯來源
-  - 選擇 DeepSeek V4 模型（Flash / Pro / Flash-Vision）
+  - 選擇 DeepSeek V4 分支（Flash / Pro）
   - 切換淺色 / 深色主題
-  - Flash-Vision 模式下，標題右側會出現截圖翻譯入口
+  - Flash 分支下，標題右側會出現截圖翻譯入口
 - `options/` 是完整設定頁：
   - 儲存介面語言
   - 儲存後端 URL 與後端端點類型
   - 儲存 DeepL API Key 與 endpoint 類型
   - 儲存 DeepSeek API Key
-  - 選擇 DeepSeek V4 模型與串流輸出模式
+  - 選擇 DeepSeek V4 分支與串流輸出模式
 
 ## 翻譯模式 🔀
 
 ### 1. 直連 API 模式 🔌
 
-在這個模式下，瀏覽器會直接請求翻譯服務提供者。
+在這個模式下，瀏覽器會直接請求翻譯服務商。
 
 目前支援的 provider：
 
 - DeepL
 - DeepSeek
 
-目前狀態：
+#### DeepSeek V4 分支
 
-- DeepL：已實作
-- DeepSeek：已實作
-- Google Translate：介面入口已預留，但目前尚未實作
+DeepSeek 直連 API 提供兩個分支，兩者都呼叫 `https://api.deepseek.com` 的 chat completions 介面：
+
+- `Flash`（`deepseek-flash`）：雙功能分支，劃詞翻譯與截圖翻譯皆可使用，兩者共用同一套 Flash 提示詞。
+- `Pro`（`deepseek-v4-pro`）：只做純文字劃詞翻譯，不支援截圖翻譯，也不顯示截圖入口。
+
+截圖入口只在 `自訂 API -> DeepSeek V4 -> Flash` 下展開，其他分支維持純文字劃詞的互動邏輯。
 
 ### 2. 後端中轉模式 🖥️
 
-在這個模式下，擴充功能不會直接請求翻譯服務提供者，而是把請求送到你自己的伺服器。
+在這個模式下，擴充功能不會直接請求翻譯服務商，而是把請求送到你自己的伺服器。
 
 目前 UI 支援的後端端點類型：
 
@@ -147,7 +150,7 @@
 }
 ```
 
-專案目前 README 中提到的配套後端倉庫：
+本專案 README 中提到的配套後端專案：
 
 - [translate-on-select-backend](https://github.com/simon-hale/translate-on-select-backend)
 
@@ -155,7 +158,7 @@
 
 目前專案沒有建置步驟，可以直接作為 unpacked extension 載入。
 
-1. Clone 或下載本倉庫。
+1. Clone 或下載本專案。
 2. 開啟 Chrome，進入 `chrome://extensions/`。
 3. 開啟 `Developer mode`。
 4. 點擊 `Load unpacked`。
@@ -170,7 +173,7 @@
 - 選擇目標語言
 - 選擇 `自訂伺服器` 或 `自訂 API`
 - 快速切換目前 provider
-- 選擇 DeepSeek V4 模型
+- 選擇 DeepSeek V4 分支
 - 切換淺色 / 深色主題
 
 Popup 介面概覽：
@@ -179,7 +182,7 @@ Popup 介面概覽：
 
 ### 在 options 頁面中完整設定 🧰
 
-打開設定頁後，你可以設定以下幾種方式：
+開啟設定頁後，你可以設定以下幾種方式：
 
 Options 介面概覽：
 
@@ -202,11 +205,12 @@ Options 介面概覽：
 
 可選：
 
-- 選擇 Deepseek V4 模型：
-  - `Flash` (`deepseek-v4-flash`)
-  - `Pro` (`deepseek-v4-pro`)
-  - `Flash-Vision` (`deepseek-v4-flash-vision-exp`) —— 會啟用截圖翻譯入口
+- 選擇 DeepSeek V4 分支：
+  - `Flash` (`deepseek-flash`) —— 劃詞翻譯 + 截圖翻譯入口
+  - `Pro` (`deepseek-v4-pro`) —— 僅純文字劃詞翻譯，不支援截圖
 - 在設定頁面開啟或關閉串流輸出
+
+舊模型名 `deepseek-v4-flash` 與 `deepseek-v4-flash-vision-exp` 仍可透過 API 呼叫，但都由目前的 Flash 模型提供服務並以 Flash 價格計費；擴充功能會自動把設定中的舊取值遷移為 `deepseek-flash`。
 
 #### C. 後端中轉
 
@@ -214,7 +218,7 @@ Options 介面概覽：
 
 - server URL
 - 端點類型：
-  - `Deepseek V4`
+  - `DeepSeek V4`
   - `DeepL`
 
 可選：
@@ -229,9 +233,10 @@ Options 介面概覽：
 - 目前實作中，選取文字長度超過 `2400` 字元會被拒絕。
 - 結果彈層支援手動複製。
 - 目前實作中，結果彈層不會自動定時關閉。
-- 截圖翻譯（Flash-Vision）：在 popup 中點擊 `截圖`，拖曳框選範圍，透過控制點調整後確認。截圖範圍僅保留在記憶體中，確認後才傳送給 DeepSeek，使用後立即捨棄。Flash-Vision 模式下，劃詞翻譯仍可使用，文字請求以原始文字提示詞呼叫同一 Flash-Vision 模型，截圖請求則使用專屬的視覺提示詞。
+- 截圖翻譯（Flash 分支）：在 popup 中點擊 `截圖`，拖曳框選範圍，透過控制點調整後確認。截圖範圍僅保留在記憶體中，確認後才傳送給 DeepSeek，使用後立即捨棄。Flash 分支下劃詞翻譯仍可使用，文字請求與截圖請求呼叫同一 Flash 模型、共用同一套提示詞模板，只是翻譯對象不同（選取文字 / 圖片中可見文字）。
 - 介面支援 English、簡體中文 與 繁體中文 三種語言。
 - 儲存後的主題模式會重用到 popup、options 頁面與頁內翻譯浮層。
+- 自繪下拉式選單同一時間只展開一個：展開某個下拉式選單時會自動收合其他已展開的選單。
 
 ## 專案結構 📁
 
@@ -240,11 +245,10 @@ Options 介面概覽：
 ├─ background/
 │  ├─ background.js              # 背景分發器與 provider 路由
 │  └─ api/
-│     ├─ deepl_api.js            # DeepL 直連適配器
-│     ├─ deepseek_api.js         # DeepSeek 直連適配器
-│     ├─ deepseek_vision_api.js  # DeepSeek flash-vision 適配器（截圖翻譯）
+│     ├─ deepl_api.js            # DeepL 直連配接器
+│     ├─ deepseek_api.js         # DeepSeek 直連配接器（Flash 劃詞 + Flash 截圖，Pro 劃詞）
 │     ├─ sse_reader.js           # 共享 SSE 串流解析器
-│     └─ server_api.js           # 後端中轉適配器
+│     └─ server_api.js           # 後端中轉配接器
 ├─ front/
 │  └─ contentScript.js           # 劃詞偵測與頁面內翻譯彈層
 ├─ menu/
@@ -277,13 +281,13 @@ Options 介面概覽：
 
 - 從 `chrome.storage.local` 讀取設定
 - 根據目前模式選擇翻譯路徑
-- 為不同 provider 正規化目標語言格式
+- 為不同 provider 將目標語言格式標準化
 - 在 DeepSeek 串流情境下把 chunk 轉發給頁面
 
 ### `background/api/*.js`
 
 - `deepl_api.js`：請求 DeepL REST API
-- `deepseek_api.js`：請求 DeepSeek Chat Completions API
+- `deepseek_api.js`：請求 DeepSeek Chat Completions API；同一個配接器同時處理文字提示詞與截圖提示詞
 - `server_api.js`：請求你自己的後端服務
 
 ### `shared/*.js`
@@ -293,7 +297,7 @@ Options 介面概覽：
 
 ## 本機儲存 💾
 
-擴充功能會把設定保存在 `chrome.storage.local` 中，包括：
+擴充功能會把設定儲存在 `chrome.storage.local` 中，包括：
 
 - backend mode
 - provider 選擇
@@ -308,7 +312,7 @@ Options 介面概覽：
 
 ## 隱私政策 🔒
 
-倉庫中提供了三種語言版本的隱私政策文本：
+本專案中提供了三種語言版本的隱私權政策文件：
 
 - [English](./PrivacyPolicyAndSecure.md)
 - [簡體中文](./PrivacyPolicyAndSecure.zh-CN.md)
@@ -318,33 +322,31 @@ Options 介面概覽：
 
 這個專案目前更偏向「方便可用」，而不是「已完成安全加固」。
 
-- 在直連 API 模式下，API Key 會保存在 `chrome.storage.local` 中。
-- 在後端中轉模式下，安全性取決於你的伺服器端如何保存與保護 provider 憑證。
+- 在直連 API 模式下，API Key 會儲存在 `chrome.storage.local` 中。
+- 在後端中轉模式下，安全性取決於你的伺服器端如何儲存與保護 provider 憑證。
 - 如果你使用中轉後端，更建議把金鑰放在環境變數或專門的 secret 管理解決方案中，而不是直接放在檔案裡。
 
 ## 目前限制 ⚠️
 
-- Google Translate 尚未實作
 - 目前截圖主要展示簡體中文介面
 - 目前沒有自動化測試
-- 目前沒有打包或發布流程
+- 目前沒有打包或發佈流程
 - 後端中轉模式依賴你自行實作並維護後端契約
 
 ## 開發 👨‍💻
 
-這個倉庫目前足夠簡單，適合直接修改原始碼後在 Chrome 中 reload 進行調試。
+這個專案目前足夠簡單，適合直接修改原始碼後在 Chrome 中 reload 進行偵錯。
 
 推薦本機開發流程：
 
-1. 修改倉庫中的檔案。
-2. 打開 `chrome://extensions/`。
+1. 修改專案中的檔案。
+2. 開啟 `chrome://extensions/`。
 3. 重新載入這個 unpacked extension。
 4. 重新驗證 popup、options 頁面與網頁中的劃詞翻譯流程。
 
 ## 路線圖 💡
 
-- 支援 Google Translate
 - 改進金鑰與敏感資訊管理方式
 - 補充截圖與展示 GIF
 - 提升多語言支援
-- 為 provider 適配器與設定邏輯補上測試
+- 為 provider 配接器與設定邏輯補上測試

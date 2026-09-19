@@ -454,7 +454,7 @@
 
   // ---------------------------------------------------------------------------
   // Vision capture: screenshot the page, let the user adjust a crop region,
-  // then translate it with the Deepseek vision model.
+  // then translate it with the DeepSeek Flash branch.
   // ---------------------------------------------------------------------------
 
   const VISION_BOX_MIN = 48;

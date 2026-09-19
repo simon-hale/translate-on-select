@@ -1,7 +1,7 @@
 // background/api/sse_reader.js
 // Shared SSE reader for OpenAI-compatible streaming responses.
-// Used by the Deepseek vision interface; the text interface keeps its own
-// inline reader so its existing logic is left untouched.
+// Used by the DeepSeek adapter for both its text-selection and screenshot
+// requests, so the streaming logic lives in one place.
 
 function extractPayloadText(payload) {
   let textChunk = '';

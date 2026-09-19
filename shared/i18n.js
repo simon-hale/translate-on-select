@@ -25,18 +25,16 @@
           'api': 'Custom API'
         },
         'serverTargets': {
-          'deepseek/': 'Deepseek V4',
+          'deepseek/': 'DeepSeek V4',
           'deepl/': 'DeepL'
         },
         'apiBrands': {
           'deepl-api': 'DeepL',
-          'deepseek-api': 'Deepseek V4',
-          'google-api': 'Google Translate'
+          'deepseek-api': 'DeepSeek V4'
         },
         'deepseekModels': {
-          'deepseek-v4-flash': 'Flash',
-          'deepseek-v4-pro': 'Pro',
-          'deepseek-v4-flash-vision-exp': 'Flash-Vision'
+          'deepseek-flash': 'Flash',
+          'deepseek-v4-pro': 'Pro'
         },
         'streamModes': {
           'true': 'Streaming',
@@ -59,8 +57,8 @@
         'quickModeLabel': 'Quick Mode',
         'quickServerLabel': 'Server Endpoint',
         'quickApiLabel': 'API Source',
-        'deepseekModelLabel': 'Deepseek V4 Model',
-        'streamModeLabel': 'Deepseek Output Mode',
+        'deepseekModelLabel': 'DeepSeek V4 Model',
+        'streamModeLabel': 'DeepSeek Output Mode',
         'storageNote': 'Settings are stored locally only.',
         'moreSettingsButton': 'More Settings',
         'visionButton': 'Capture',
@@ -83,14 +81,12 @@
         'clearButton': 'Clear',
         'apiTitle': 'API Brand',
         'apiBrandLabel': 'Current Brand',
-        'deepseekModelLabel': 'Deepseek V4 Model',
+        'deepseekModelLabel': 'DeepSeek V4 Model',
         'deeplTitle': 'DeepL',
         'apiKeyLabel': 'API Key',
         'endpointLabel': 'Endpoint',
         'clearKeyButton': 'Clear Key',
-        'deepseekTitle': 'Deepseek',
-        'googleTitle': 'Google',
-        'notImplementedText': 'You can add configuration fields here later.',
+        'deepseekTitle': 'DeepSeek',
         'modeSummaries': {
           'server': 'Currently using server mode.',
           'api': 'Currently using API mode.'
@@ -108,9 +104,9 @@
           'deeplKeyRequired': 'Please enter the DeepL API key.',
           'deeplSaved': 'DeepL settings saved.',
           'deeplCleared': 'DeepL settings cleared.',
-          'deepseekKeyRequired': 'Please enter the Deepseek API key.',
-          'deepseekSaved': 'Deepseek settings saved.',
-          'deepseekCleared': 'Deepseek settings cleared.'
+          'deepseekKeyRequired': 'Please enter the DeepSeek API key.',
+          'deepseekSaved': 'DeepSeek settings saved.',
+          'deepseekCleared': 'DeepSeek settings cleared.'
         }
       },
       'content': {
@@ -150,18 +146,16 @@
           'api': '自定义 API'
         },
         'serverTargets': {
-          'deepseek/': 'Deepseek V4',
+          'deepseek/': 'DeepSeek V4',
           'deepl/': 'DeepL'
         },
         'apiBrands': {
           'deepl-api': 'DeepL',
-          'deepseek-api': 'Deepseek V4',
-          'google-api': 'Google Translate'
+          'deepseek-api': 'DeepSeek V4'
         },
         'deepseekModels': {
-          'deepseek-v4-flash': 'Flash',
-          'deepseek-v4-pro': 'Pro',
-          'deepseek-v4-flash-vision-exp': 'Flash-Vision'
+          'deepseek-flash': 'Flash',
+          'deepseek-v4-pro': 'Pro'
         },
         'streamModes': {
           'true': '流式输出',
@@ -184,8 +178,8 @@
         'quickModeLabel': '快速切换模式',
         'quickServerLabel': '服务器端点',
         'quickApiLabel': 'API 来源',
-        'deepseekModelLabel': 'Deepseek V4 模型',
-        'streamModeLabel': 'Deepseek 输出模式',
+        'deepseekModelLabel': 'DeepSeek V4 模型',
+        'streamModeLabel': 'DeepSeek 输出模式',
         'storageNote': '配置仅保存在本地。',
         'moreSettingsButton': '更多设置',
         'visionButton': '截图',
@@ -208,14 +202,12 @@
         'clearButton': '清空',
         'apiTitle': 'API 品牌',
         'apiBrandLabel': '当前品牌',
-        'deepseekModelLabel': 'Deepseek V4 模型',
+        'deepseekModelLabel': 'DeepSeek V4 模型',
         'deeplTitle': 'DeepL',
         'apiKeyLabel': 'API Key',
         'endpointLabel': 'Endpoint',
         'clearKeyButton': '清空 Key',
-        'deepseekTitle': 'Deepseek',
-        'googleTitle': 'Google',
-        'notImplementedText': '后续可在这里补充配置项。',
+        'deepseekTitle': 'DeepSeek',
         'modeSummaries': {
           'server': '当前为服务器模式。',
           'api': '当前为 API 模式。'
@@ -233,9 +225,9 @@
           'deeplKeyRequired': '请输入 DeepL API Key。',
           'deeplSaved': 'DeepL 配置已保存。',
           'deeplCleared': 'DeepL 配置已清空。',
-          'deepseekKeyRequired': '请输入 Deepseek API Key。',
-          'deepseekSaved': 'Deepseek 配置已保存。',
-          'deepseekCleared': 'Deepseek 配置已清空。'
+          'deepseekKeyRequired': '请输入 DeepSeek API Key。',
+          'deepseekSaved': 'DeepSeek 配置已保存。',
+          'deepseekCleared': 'DeepSeek 配置已清空。'
         }
       },
       'content': {
@@ -275,18 +267,16 @@
           'api': '自訂 API'
         },
         'serverTargets': {
-          'deepseek/': 'Deepseek V4',
+          'deepseek/': 'DeepSeek V4',
           'deepl/': 'DeepL'
         },
         'apiBrands': {
           'deepl-api': 'DeepL',
-          'deepseek-api': 'Deepseek V4',
-          'google-api': 'Google Translate'
+          'deepseek-api': 'DeepSeek V4'
         },
         'deepseekModels': {
-          'deepseek-v4-flash': 'Flash',
-          'deepseek-v4-pro': 'Pro',
-          'deepseek-v4-flash-vision-exp': 'Flash-Vision'
+          'deepseek-flash': 'Flash',
+          'deepseek-v4-pro': 'Pro'
         },
         'streamModes': {
           'true': '串流輸出',
@@ -309,8 +299,8 @@
         'quickModeLabel': '快速切換模式',
         'quickServerLabel': '伺服器端點',
         'quickApiLabel': 'API 來源',
-        'deepseekModelLabel': 'Deepseek V4 模型',
-        'streamModeLabel': 'Deepseek 輸出模式',
+        'deepseekModelLabel': 'DeepSeek V4 模型',
+        'streamModeLabel': 'DeepSeek 輸出模式',
         'storageNote': '設定只會儲存在本機。',
         'moreSettingsButton': '更多設定',
         'visionButton': '截圖',
@@ -333,14 +323,12 @@
         'clearButton': '清空',
         'apiTitle': 'API 品牌',
         'apiBrandLabel': '目前品牌',
-        'deepseekModelLabel': 'Deepseek V4 模型',
+        'deepseekModelLabel': 'DeepSeek V4 模型',
         'deeplTitle': 'DeepL',
         'apiKeyLabel': 'API Key',
         'endpointLabel': 'Endpoint',
         'clearKeyButton': '清空 Key',
-        'deepseekTitle': 'Deepseek',
-        'googleTitle': 'Google',
-        'notImplementedText': '之後可以在這裡補上設定項目。',
+        'deepseekTitle': 'DeepSeek',
         'modeSummaries': {
           'server': '目前為伺服器模式。',
           'api': '目前為 API 模式。'
@@ -358,9 +346,9 @@
           'deeplKeyRequired': '請輸入 DeepL API Key。',
           'deeplSaved': 'DeepL 設定已儲存。',
           'deeplCleared': 'DeepL 設定已清空。',
-          'deepseekKeyRequired': '請輸入 Deepseek API Key。',
-          'deepseekSaved': 'Deepseek 設定已儲存。',
-          'deepseekCleared': 'Deepseek 設定已清空。'
+          'deepseekKeyRequired': '請輸入 DeepSeek API Key。',
+          'deepseekSaved': 'DeepSeek 設定已儲存。',
+          'deepseekCleared': 'DeepSeek 設定已清空。'
         }
       },
       'content': {
@@ -384,11 +372,31 @@
   const uiLanguageValues = ['en', 'zh-CN', 'zh-TW'];
   const backendModeValues = ['server', 'api'];
   const serverTargetValues = ['deepseek/', 'deepl/'];
-  const apiBrandValues = ['deepl-api', 'deepseek-api', 'google-api'];
-  const deepseekModelValues = ['deepseek-v4-flash', 'deepseek-v4-pro', 'deepseek-v4-flash-vision-exp'];
+  const apiBrandValues = ['deepl-api', 'deepseek-api'];
   const streamModeValues = ['true', 'false'];
   const httpMethodValues = ['POST', 'GET'];
   const deeplEndpointValues = ['free-deepl', 'pro-deepl'];
+
+  // DeepSeek 直连的两个分支：Flash 同时支持划词与截图，Pro 只做纯文本划词翻译、不支持截图。
+  const DEEPSEEK_FLASH_MODEL = 'deepseek-flash';
+  const DEEPSEEK_PRO_MODEL = 'deepseek-v4-pro';
+  const deepseekModelValues = [DEEPSEEK_FLASH_MODEL, DEEPSEEK_PRO_MODEL];
+
+  // 当前有效的 API 品牌；历史配置里可能残留已下线的品牌（google-api），
+  // 统一回落到默认品牌，避免下拉框显示与 storage 中的取值不一致。
+  const DEFAULT_API_BRAND = 'deepseek-api';
+  const apiBrandSet = new Set(apiBrandValues);
+
+  function normalizeApiBrand(brand) {
+    const value = String(brand || '');
+    return apiBrandSet.has(value) ? value : DEFAULT_API_BRAND;
+  }
+
+  // 历史配置里可能残留旧模型名（deepseek-v4-flash / deepseek-v4-flash-vision-exp），
+  // 统一归一到当前模型名，避免旧取值在下拉框中落空。
+  function normalizeDeepseekModel(model) {
+    return String(model || '') === DEEPSEEK_PRO_MODEL ? DEEPSEEK_PRO_MODEL : DEEPSEEK_FLASH_MODEL;
+  }
 
   function normalizeUiLanguage(language) {
     const normalized = String(language || '').trim().toLowerCase().replace(/_/g, '-');
@@ -562,6 +570,11 @@
   global.TranslateOnSelectI18n = {
     'UI_LANGUAGE_KEY': UI_LANGUAGE_KEY,
     'DEFAULT_UI_LANGUAGE': DEFAULT_UI_LANGUAGE,
+    'DEFAULT_API_BRAND': DEFAULT_API_BRAND,
+    'DEEPSEEK_FLASH_MODEL': DEEPSEEK_FLASH_MODEL,
+    'DEEPSEEK_PRO_MODEL': DEEPSEEK_PRO_MODEL,
+    'normalizeApiBrand': normalizeApiBrand,
+    'normalizeDeepseekModel': normalizeDeepseekModel,
     'normalizeUiLanguage': normalizeUiLanguage,
     'detectInitialUiLanguage': detectInitialUiLanguage,
     'resolveUiLanguage': resolveUiLanguage,

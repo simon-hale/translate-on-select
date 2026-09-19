@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     apiBrand: 'deepl-api',
     deeplApiKey: '',
     deepseekApiKey: '',
-    deepseekModel: 'deepseek-v4-flash',
+    deepseekModel: i18n.DEEPSEEK_FLASH_MODEL,
     streamDeepseek: 'true',
     deeplEndpoint: 'free-deepl',
     [i18n.UI_LANGUAGE_KEY]: i18n.detectInitialUiLanguage(),
@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearBtnDeepseek = document.getElementById('clearBtn-deepseek');
   const visibilityToggles = Array.from(document.querySelectorAll('.input-visibility-toggle'));
 
-  const googleSection = document.getElementById('googleApiSection');
   const modeBadge = document.getElementById('modeBadge');
   const brandBadge = document.getElementById('brandBadge');
   const modeSummary = document.getElementById('modeSummary');
@@ -141,12 +140,14 @@ document.addEventListener('DOMContentLoaded', () => {
     setSectionState(deepseekStreamField, mode === 'api' && brand === 'deepseek-api');
     setSectionState(deeplSection, mode === 'api' && brand === 'deepl-api');
     setSectionState(deepseekSection, mode === 'api' && brand === 'deepseek-api');
-    setSectionState(googleSection, mode === 'api' && brand === 'google-api');
     updateOverview();
   }
 
   function renderLocalizedUi(items) {
     currentLanguage = i18n.resolveUiLanguage(items[i18n.UI_LANGUAGE_KEY]);
+    const model = i18n.normalizeDeepseekModel(items.deepseekModel);
+    // 旧配置兼容：google-api 已下线，残留取值回落到当前默认品牌
+    const brand = i18n.normalizeApiBrand(items.apiBrand);
 
     theme.applyDocumentTheme(document, items[theme.THEME_MODE_KEY]);
     document.documentElement.lang = currentLanguage;
@@ -157,8 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
     i18n.populateSelect(backendModelSelect, i18n.getBackendModeOptions(currentLanguage), items.backendMode);
     i18n.populateSelect(httpMethodSelect, i18n.getHttpMethodOptions(currentLanguage), items.httpMethod);
     i18n.populateSelect(apiSelectServer, i18n.getServerTargetOptions(currentLanguage), items.apiSelectServer);
-    i18n.populateSelect(apiSelect, i18n.getApiBrandOptions(currentLanguage), items.apiBrand);
-    i18n.populateSelect(deepseekModelSelect, i18n.getDeepseekModelOptions(currentLanguage), items.deepseekModel);
+    i18n.populateSelect(apiSelect, i18n.getApiBrandOptions(currentLanguage), brand);
+    i18n.populateSelect(deepseekModelSelect, i18n.getDeepseekModelOptions(currentLanguage), model);
     i18n.populateSelect(streamDeepseekSelect, i18n.getStreamModeOptions(currentLanguage), items.streamDeepseek);
     i18n.populateSelect(endpointSelectDeepl, i18n.getDeeplEndpointOptions(currentLanguage), items.deeplEndpoint);
 
@@ -168,6 +169,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     refreshVisibilityToggleLabels();
+
+    // 旧模型名（deepseek-v4-flash / deepseek-v4-flash-vision-exp）写回归一后的取值
+    if (items.deepseekModel !== model) {
+      chrome.storage.local.set({ deepseekModel: model });
+    }
+
+    // 旧 API 品牌（google-api）同样写回，保证 UI 与实际配置一致
+    if (items.apiBrand !== brand) {
+      chrome.storage.local.set({ apiBrand: brand });
+    }
   }
 
   function loadSavedSettings() {

@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     apiBrand: 'deepseek-api',
     apiSelectServer: 'deepseek/',
     targetLanguage: 'ZH-HANS',
-    deepseekModel: 'deepseek-v4-flash',
+    deepseekModel: i18n.DEEPSEEK_FLASH_MODEL,
     streamDeepseek: 'true',
     [i18n.UI_LANGUAGE_KEY]: i18n.detectInitialUiLanguage(),
     [theme.THEME_MODE_KEY]: theme.DEFAULT_THEME_MODE
@@ -49,23 +49,27 @@ document.addEventListener('DOMContentLoaded', () => {
     themeToggleBtn.setAttribute('title', label);
   }
 
-  function updateVisibility(items) {
+  function updateVisibility(items, model) {
     const isServerMode = items.backendMode === 'server';
     const isDeepseekApi = items.backendMode === 'api' && items.apiBrand === 'deepseek-api';
-    const isVisionModel = items.deepseekModel === 'deepseek-v4-flash-vision-exp';
+    // Flash 分支同时支持划词与截图；Pro 分支保持纯文字划词
+    const canCapture = isDeepseekApi && model === i18n.DEEPSEEK_FLASH_MODEL;
 
     quickServerGroup.hidden = !isServerMode;
     quickApiGroup.hidden = isServerMode;
     deepseekModelGroup.hidden = !isDeepseekApi;
 
-    // 仅 Deepseek API + Flash-Vision 模型时提供截图翻译入口
+    // 仅 DeepSeek API + Flash 模型时提供截图翻译入口
     if (visionGroup) {
-      visionGroup.hidden = !(isDeepseekApi && isVisionModel);
+      visionGroup.hidden = !canCapture;
     }
   }
 
   function renderUi(items) {
     const language = i18n.resolveUiLanguage(items[i18n.UI_LANGUAGE_KEY]);
+    const model = i18n.normalizeDeepseekModel(items.deepseekModel);
+    // 旧配置兼容：google-api 已下线，残留取值回落到当前默认品牌
+    const brand = i18n.normalizeApiBrand(items.apiBrand);
 
     currentUiLanguage = language;
     applyThemeMode(items[theme.THEME_MODE_KEY], language);
@@ -76,15 +80,25 @@ document.addEventListener('DOMContentLoaded', () => {
     i18n.populateSelect(targetInput, i18n.getTargetLanguageOptions(language), items.targetLanguage);
     i18n.populateSelect(quickModeSelect, i18n.getBackendModeOptions(language), items.backendMode);
     i18n.populateSelect(quickApiSelectServer, i18n.getServerTargetOptions(language), items.apiSelectServer);
-    i18n.populateSelect(quickApiSelect, i18n.getApiBrandOptions(language), items.apiBrand);
-    i18n.populateSelect(deepseekModelSelect, i18n.getDeepseekModelOptions(language), items.deepseekModel);
+    i18n.populateSelect(quickApiSelect, i18n.getApiBrandOptions(language), brand);
+    i18n.populateSelect(deepseekModelSelect, i18n.getDeepseekModelOptions(language), model);
 
     // 自绘下拉：选项重新填充后同步显示
     if (globalThis.TranslateOnSelectSelect) {
       globalThis.TranslateOnSelectSelect.enhanceAll(document);
     }
 
-    updateVisibility(items);
+    updateVisibility({ ...items, apiBrand: brand }, model);
+
+    // 旧模型名（deepseek-v4-flash / deepseek-v4-flash-vision-exp）写回归一后的取值
+    if (items.deepseekModel !== model) {
+      chrome.storage.local.set({ deepseekModel: model });
+    }
+
+    // 旧 API 品牌（google-api）同样写回，保证 UI 与实际配置一致
+    if (items.apiBrand !== brand) {
+      chrome.storage.local.set({ apiBrand: brand });
+    }
   }
 
   function updateModeUI() {

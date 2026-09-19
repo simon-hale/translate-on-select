@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     serverUrl: '',
     httpMethod: 'POST',
     apiSelectServer: 'deepseek/',
-    apiBrand: 'deepl-api',
+    apiBrand: 'deepseek-api',
     deeplApiKey: '',
     deepseekApiKey: '',
     deepseekModel: i18n.DEEPSEEK_FLASH_MODEL,
@@ -64,16 +64,21 @@ document.addEventListener('DOMContentLoaded', () => {
     element.hidden = !visible;
   }
 
+  // 取值缺失时回落到 i18n 中的通用兜底键
+  function tOr(key, fallbackKey) {
+    return i18n.t(currentLanguage, key) || i18n.t(currentLanguage, fallbackKey);
+  }
+
   function getModeLabel(mode) {
-    return i18n.t(currentLanguage, `shared.backendModes.${mode}`) || i18n.t(currentLanguage, 'shared.backendModes.server');
+    return tOr(`shared.backendModes.${mode}`, 'shared.backendModes.server');
   }
 
   function getBrandLabel(mode, brand, serverBrand) {
     if (mode === 'server') {
-      return i18n.t(currentLanguage, `shared.serverTargets.${serverBrand}`) || i18n.t(currentLanguage, 'shared.serverTargets.deepseek/');
+      return tOr(`shared.serverTargets.${serverBrand}`, 'shared.serverTargets.deepseek/');
     }
 
-    return i18n.t(currentLanguage, `shared.apiBrands.${brand}`) || i18n.t(currentLanguage, 'shared.apiBrands.deepl-api');
+    return tOr(`shared.apiBrands.${brand}`, 'shared.apiBrands.deepseek-api');
   }
 
   function setInputVisibility(input, toggle, visible) {

@@ -111,7 +111,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
       // 赋值本地数据
       const backendMode = items && items.backendMode ? items.backendMode : 'server';
-      const storedBrand = items && items.apiBrand ? items.apiBrand : 'deepl-api'; // default if api mode
+      const storedBrand = items && items.apiBrand ? items.apiBrand : 'deepseek-api'; // 与 popup / options 的默认品牌保持一致
       const apiBrand = resolveApiBrand(storedBrand);
       const targetFormat = normalizeTargetForBrand(apiBrand, msg.target || items && items.targetLanguage || 'ZH-HANS');
       const streamDeepseek = items && items.streamDeepseek ? (items.streamDeepseek === 'true') : false;
@@ -217,7 +217,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       console.error('BG dispatcher error:', err);
       // 尽可能通知页面
       try {
-        const tabId = (arguments[2] && arguments[2].tab && arguments[2].tab.id) || null;
+        const tabId = (sender && sender.tab && sender.tab.id) || null;
         if (tabId) chrome.tabs.sendMessage(tabId, { action: 'translate_stream', done: true, success: false, error: err && err.message ? err.message : String(err) });
       } catch (e) {}
       sendResponse({ success: false, error: err && err.message ? err.message : String(err) });

@@ -2,10 +2,11 @@
 // DeepSeek 直连适配器。
 //
 // 同一个 Flash 模型同时承担两种输入：
-//   文本输入 -> 传入 text，提示词翻译对象为选中文字
-//   图片输入 -> 传入 imageDataUrl，提示词翻译对象为图片中可见文字
+//   文本输入 -> 传入 text，system 消息承载提示词，user 消息承载选中文字
+//   图片输入 -> 传入 imageDataUrl，system 同样承载提示词，
+//               user 消息以 OpenAI 兼容的 content 块数组承载图片
 // 两者共用同一套提示词模板、请求、错误处理与 SSE 流式解析逻辑，
-// 仅 messages 的组织方式随输入类型不同（文本走 system，图片走 content 块数组）。
+// 区别只在 user 消息的 content 组织形式。
 import { createSseTextIterable } from './sse_reader.js';
 
 const CHAT_COMPLETIONS_URL = 'https://api.deepseek.com/chat/completions';
@@ -28,7 +29,7 @@ function buildFlashPrompt(target, source) {
   );
 }
 
-// 文本请求：整段待翻译文字内联进 system 提示词。
+// 文本请求：system 消息承载提示词，user 消息承载待翻译的纯文本。
 function buildTextMessages(text, target) {
   return [
     { role: 'system', content: buildFlashPrompt(target, 'text') },
@@ -36,9 +37,11 @@ function buildTextMessages(text, target) {
   ];
 }
 
-// 图片请求：base64 data URL 以 OpenAI 兼容的 content 块数组内联传入。
+// 图片请求：system 消息承载提示词，user 消息的 content 使用 OpenAI 兼容的
+// 块数组，先给出提示词，再把图片以 base64 data URL 内联传入。
 function buildImageMessages(imageDataUrl, target) {
   return [
+    { role: 'system', content: buildFlashPrompt(target, 'image') },
     {
       role: 'user',
       content: [

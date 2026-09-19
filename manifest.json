@@ -1,6 +1,6 @@
 {
   "name": "Translate-on-select",
-  "description": "This is a Chrome Extension that you can translate the phrase or the sentance what you select on the page.",
+  "description": "Translate selected text on any webpage right where you are reading it.",
   "version": "2.0.0",
   "manifest_version": 3,
   "action": {

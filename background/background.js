@@ -114,7 +114,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const storedBrand = items && items.apiBrand ? items.apiBrand : 'deepseek-api'; // 与 popup / options 的默认品牌保持一致
       const apiBrand = resolveApiBrand(storedBrand);
       const targetFormat = normalizeTargetForBrand(apiBrand, msg.target || items && items.targetLanguage || 'ZH-HANS');
-      const streamDeepseek = items && items.streamDeepseek ? (items.streamDeepseek === 'true') : false;
+      const streamDeepseek = items && items.streamDeepseek != null ? String(items.streamDeepseek) === 'true' : true;
       const deepseekModel = resolveDeepseekModel(items && items.deepseekModel);
 
       // 旧配置兼容：google-api 分支已下线，把 storage 中的残留取值迁移到当前默认品牌
